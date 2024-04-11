@@ -1,4 +1,4 @@
-// Le fond de carte
+// Ajout du fond de carte (mapbox donc nécessaire d'avoir un access token)
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGNyb2NvIiwiYSI6ImNsc2tkdDhtMTAyaGYyd253c2I5Z3hrc2UifQ.5BLIcpfsRJ5OpRYex0y6PQ';
 
     // Configuration de la carte
@@ -6,14 +6,14 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/dcroco/clsmz8fbx01fc01qlhvm38cuq', // Fond de carte
     center: [-2.9205663298399966, 48.21422772374418], // lat/long 48.855396472127794, 2.345032229371638
-    zoom: 7, // zoom
+    zoom: 7, // niveau de zoom
     pitch: 0, // Inclinaison
     bearing: 0, // Rotation
-    customAttribution : '<a href="https://rbu.jimdo.com//">Réseau Bretagne Urgence</a>'
+    customAttribution : '<a href="https://rbu.jimdo.com//">Réseau Bretagne Urgence</a>' // Lien vers le site du RBU (situé dans les sources)
 });
 
 
- // Add the control to the map.
+ // Fonction de controle de la map (possibilité de se déplacer)
     map.addControl(
         new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
@@ -27,7 +27,7 @@ var map = new mapboxgl.Map({
 // Target the params form in the HTML
 var params = document.getElementById('params');
  
-// Create variables to use in getIso()
+// Création des paramètres utilisés dans getIso()
 var urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
 var lon = -1.68;
 var lat = 48.12;
@@ -35,6 +35,7 @@ var profile = 'driving';
 var minutes = 30;
 
 
+// Création de la fonction getIso() qui récupère l'API et fait appel à Ajax
 // Create a function that sets up the Isochrone API query then makes an Ajax call
 function getIso() {
     var query =
@@ -186,6 +187,14 @@ map.on('load', () => {
         url: 'https://wxs.ign.fr/topographie/geoportail/tms/1.0.0/BDTOPO/metadata.json',
        
     });
+    
+    map.addLayer({
+      'id': 'Contour',
+      'type': 'fill',
+      'source': {
+          'type': 'geojson',
+          'data': './DATA/contour_bretagne.geojson'}
+    });
         
         map.addLayer({
             'id': 'mesbatiments',
@@ -282,7 +291,7 @@ map.on('click', 'hopitaux', function (e) {
     var site_web = e.features[0].properties.website;
     var displaySiteWeb = site_web.length > 20 ? site_web.substring(0, 20) + "..." : site_web; /* Le lien hypertexte mais raccourci*/
   
-    // Créez le contenu HTML pour le popup
+    // Créer le contenu HTML pour la popup des Hop
   
      var popupContent = "<div class='popup'>";
 popupContent += "<h3>" + nomHopital + "</h3>";
