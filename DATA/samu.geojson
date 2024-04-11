@@ -1,0 +1,15 @@
+{
+"type": "FeatureCollection",
+"name": "samu",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::2154" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "SAMU": "SAMU 22", "Etablissement": "CH Saint-Brieuc", "Adresse": "10 rue Marcel Proust, 22000 Saint-Brieuc, France", "lat": "48.4929120074167", "long": "-2.75092784849533", "Ville": "Saint-Brieuc", "Localisation": "SAMU Bretagne" }, "geometry": { "type": "Point", "coordinates": [ 275463.598046339408029, 6836872.912878886796534 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "SAMU": "SAMU 29", "Etablissement": "CHRU Brest - Cavale Blanche", "Adresse": "Bd Tanguy Prigent, 29200 Brest", "lat": "48.4063970981593", "long": "-4.52808282344352", "Ville": "Brest", "Localisation": "SAMU Bretagne" }, "geometry": { "type": "Point", "coordinates": [ 143708.285756201483309, 6838327.411748880520463 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "SAMU": "SAMU 35", "Etablissement": "CHRU Rennes - Pontchaillou", "Adresse": "Rue du Recteur Paul Henry, 35000 Rennes, France", "lat": "48.1239271393559", "long": "-1.69932050586591", "Ville": "Rennes", "Localisation": "SAMU Bretagne" }, "geometry": { "type": "Point", "coordinates": [ 350552.568669412459712, 6790796.750503778457642 ] } },
+{ "type": "Feature", "properties": { "fid": 4, "SAMU": "SAMU 56", "Etablissement": "CHBA - Vannes", "Adresse": "Avenue Favrel et Lincy, 56000 Vannes, France", "lat": "47.6654662088476", "long": "-2.74811695773182", "Ville": "Vannes", "Localisation": "SAMU Bretagne" }, "geometry": { "type": "Point", "coordinates": [ 268982.869480383000337, 6745148.286525606177747 ] } },
+{ "type": "Feature", "properties": { "fid": 5, "SAMU": "SAMU 44 ", "Etablissement": "CHU Nantes", "Adresse": "5 allée de l'Ile Gloriette, 44000 Nantes", "lat": "47.21113", "long": "-1.5575", "Ville": "Nantes", "Localisation": "SAMU limitrophe" }, "geometry": { "type": "Point", "coordinates": [ 355236.5605768962414, 6688933.931070644408464 ] } },
+{ "type": "Feature", "properties": { "fid": 6, "SAMU": "SAMU 49", "Etablissement": "CHU Angers", "Adresse": "4 rue Larrey, 49000 Angers", "lat": "47.48306", "long": "-0.55628", "Ville": "Angers", "Localisation": "SAMU limitrophe" }, "geometry": { "type": "Point", "coordinates": [ 432277.89801986317616, 6715218.585408430546522 ] } },
+{ "type": "Feature", "properties": { "fid": 7, "SAMU": "SAMU 53", "Etablissement": "CHU Laval", "Adresse": "33 rue du haut-rocher, 53000 Laval", "lat": "48.06375", "long": "-0.78385", "Ville": "Laval", "Localisation": "SAMU limitrophe" }, "geometry": { "type": "Point", "coordinates": [ 418249.352609455527272, 6780459.851551175117493 ] } },
+{ "type": "Feature", "properties": { "fid": 8, "SAMU": "SAMU 50", "Etablissement": "CH Saint-Lô", "Adresse": "715 rue Henri Dunant, 50000 Saint-Lô", "lat": "49.10545", "long": "-1.10734", "Ville": "Saint-Lô", "Localisation": "SAMU limitrophe" }, "geometry": { "type": "Point", "coordinates": [ 400203.832242569478694, 6897313.270499529317021 ] } }
+]
+}
