@@ -1,9 +1,14 @@
 /*pour le fond de carte*/
-#map {position: absolute;
+#map {
+  position: absolute;
   top: 0px;
   bottom: 0px;
-  width: 100%;}
+  width: 100%;
+}
 
+.absolute fl my24 mx24 py24 px24 bg-gray-faint round {
+  width : 250px;
+}
 
 
 /* Style de base pour la popup */
@@ -37,100 +42,106 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* style liste deroulante */
 .dropbtn {
-background-color: #f2a11f;
-color: white;
-padding: 10px 100px;
-font-size: 20px;
-border-radius: 5px;
-border: none;
+  background-color: #f2a11f;
+  color: white;
+  padding: 10px 10px;
+  font-size: 20px;
+  border-radius: 5px;
+  border: none;
+  width : 250px;
+  text-align: center;
 }
 
 /*couleur de fond lorsque l'on passe sur la liste deroulante*/
 .dropbtn:hover, .dropbtn:focus {
-background-color: #b57205;
+  background-color: #b57205;
 }
 
 /*position de la popup menu deroulant*/
 .dropdown {
-position: absolute;
-top: 230px; /* Align to the top with 20px offset */
-left: 21px; /* Align to the left with 20px offset */
+  position: absolute;
+  top: 230px; /* Align to the top with 20px offset */
+  left: 21px; /* Align to the left with 20px offset */
 }
 
-
-/* Dropdown Content (Hidden by Default) */
+/* Liste déroulante */
 .dropdown-content {
-display: none;
-position: absolute;
-background-color: #f9f9f9;
-min-width: 160px;
-box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-z-index: 1;
-left: 0; /* Align to the left */
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  max-height: 300px; /* Hauteur maximale de la liste déroulante */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  left: 0; /* Align to the left */
+  width : 250px;
+  overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
 }
 
-/* noms des hopitaux dans la box */
+/* noms des smur dans la liste déroulante */
 .dropdown-content a {
-color: black;
-padding: 12px 56px;
-text-decoration: none;
-display: block;
+  color: black;
+  padding: 10px 10px;
+  text-decoration: none;
+  display: block;
 }
 
 /* Change color of dropdown links on hover */
-.dropdown-content a:hover {background-color: #f2a11f;}
+.dropdown-content a:hover {
+  background-color: #f2a11f;
+}
 
 /* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
-.show {display:block;}
+.show {
+  display:block;
+}
+
+/* style liste deroulante */
+.ListeUrgencebtn {
+  font: 20px 'Montserrat', Arial, Helvetica, sans-serif;
+  background-color: #f2a221;
+  color: white;
+  padding: 10px 10px;
+  border-radius: 5px;
+  border: none;
+  width : 250px;
+  text-align: center;
+}
+
+/*couleur de fond lorsque l'on passe sur la liste deroulante*/
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #b57205;
+}
 
 
+/*Style de la liste des couches*/
+.ListeUrgence {
+  font: 11px/13px 'Montserrat', Arial, Helvetica, sans-serif;
+  color: white;
+  position: absolute;
+  width: 240px;
+  top: 60px;
+  right: 10px;
+}
 
+.ListeUrgence .listeRBU-content {
+  background-color: #f2a221cc;
+  box-shadow:0 10px 15px rgba(0, 0, 0, 0.10);
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
 
+.listeRBU-content fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 10px;
+}
 
-
-
-.dropdown {
-          position: fixed; /* Position fixe sur la page */
-          top: 5 300px; /* Ajustez cette valeur selon votre mise en page */
-          left: 22px; /* Ajustez cette valeur selon votre mise en page */
-      }
-
-      .dropdown-content {
-          display: none;
-          background-color: #f1f1f1;
-          min-width: 160px;
-          max-height: 500px; /* Hauteur maximale de la liste déroulante */
-          overflow-y: auto; /* Activer la barre de défilement vertical si nécessaire */
-          box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-          z-index: 1;
-      }
-
-      .dropdown-content a {
-          color: black;
-          padding: 12px 16px;
-          text-decoration: none;
-          display: block;
-      }
-
-      .dropdown-content a:hover {
-          background-color: #ddd;
-      }
-
-      .show {
-          display: block;
-      }
+.listeRBU-content .categoryLabel {
+  display: block;
+  font-weight: bold;
+  margin: 0 0 5px;
+}

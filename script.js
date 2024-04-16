@@ -4,13 +4,14 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZGNyb2NvIiwiYSI6ImNsc2tkdDhtMTAyaGYyd253c2I5Z
 // Ajout de la carte
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/dcroco/clsmz8fbx01fc01qlhvm38cuq', // Fond de carte
+    style: 'mapbox://styles/momo4/clv2kp13600bz01qpdlzt1l9c', // Fond de carte
     center: [-2.9205663298399966, 48.21422772374418], // lat/long 48.855396472127794, 2.345032229371638
     zoom: 7, // zoom
     pitch: 0, // Inclinaison
     bearing: 0, // Rotation
     customAttribution: '<a href="https://rbu.jimdo.com//">Réseau Bretagne Urgence</a>'
 });
+
 
 // Configuration des fonctions
 
@@ -80,6 +81,8 @@ var lon = -1.68;
 var lat = 48.12;
 var profile = 'driving';
 var minutes = 30;
+// var minutes = 45;
+// var minutes = 60;
 
 
 // Ajout des données grâce à la fonction map.on 
@@ -118,8 +121,32 @@ map.on ('load', function() {
     }
   });
 
+  //ajout des routes
+  map.addSource('mapbox-streets-v8', {
+    type: 'vector',
+    url: 'mapbox://mapbox.mapbox-streets-v8'
+  });        
+  
+  map.addLayer({
+    "id": "routes",
+    "type": "line",
+    "source": "mapbox-streets-v8",
+    "source-layer": "road",
+    "filter": ["all",  ["in", "class", "primary", "motorway", "secondary", "trunk", "tertiary"]],        
+    "layout": {'visibility': 'visible'},
+    'paint': {'line-color': [
+	    'match',['get', 'class'],
+      'motorway', '#E990A0',
+      'primary', '#FDD7A1',
+      'secondary', '#FDD7A1',
+      'tertiary', '#FEFEFE',
+      'trunk', '#FBC0AC',
+      '#A5A9B0'], 'line-width' : 1.5,
+    }
+  });
+
   //Ajout des SMUR
-  map.addSource('SMUR', {
+  map.addSource('source_SMUR', {
     'type': 'geojson',
     'data': './DATA/smurok.geojson'
   });
@@ -146,7 +173,7 @@ map.on ('load', function() {
   map.addLayer({
     'id': 'SMUR',
     'type': 'symbol',
-    'source': 'SMUR',
+    'source': 'source_SMUR',
     'layout': {
       'icon-image': ['match', ['get', 'field_1'], 
                      'SMUR Bretagne', 'custom-marker-1', 
@@ -161,7 +188,7 @@ map.on ('load', function() {
   });
 
   //Ajout des SAMU 
-  map.addSource('SAMU', {
+  map.addSource('source_SAMU', {
     'type': 'geojson',
     'data': './DATA/samuok.geojson'
   });
@@ -174,7 +201,7 @@ map.on ('load', function() {
   map.addLayer({
     'id': 'SAMU',
     'type': 'symbol',
-    'source': 'SAMU',
+    'source': 'source_SAMU',
     'layout': {
       'icon-image': 'custom-marker',
       'icon-size': 0.8,
@@ -184,7 +211,7 @@ map.on ('load', function() {
   });
 
   //Ajout des SAU bretons
-  map.addSource('SAU_1', {
+  map.addSource('source_SAU', {
     'type': 'geojson',
     'data': './DATA/sauok.geojson'
   });
@@ -203,9 +230,9 @@ map.on ('load', function() {
   });
 
   map.addLayer({
-    'id': 'SAU_1',
+    'id': 'SAU',
     'type': 'symbol',
-    'source': 'SAU_1',
+    'source': 'source_SAU',
     'layout': {
       'icon-image': ['match', ['get', 'Statut'], 
                      'privé', 'custom-marker-a', 
@@ -219,15 +246,15 @@ map.on ('load', function() {
   });
 
   //Ajout des SAU limitrophes
-  map.addSource('SAU_2', {
+  map.addSource('source_SAUlim', {
     'type': 'geojson',
     'data': './DATA/sau_limitrook.geojson'
   });
 
   map.addLayer({
-    'id': 'SAU_2',
+    'id': 'SAU_lim',
     'type': 'symbol',
-    'source': 'SAU_2',
+    'source': 'source_SAU2',
     'layout': {
       'icon-image': ['match', ['get', 'Statut'], 
                      'privé', 'custom-marker-a', 
@@ -239,7 +266,7 @@ map.on ('load', function() {
       'visibility': 'none'
     }
   });
-  
+
   // Ajout isochrone pour le menu deroulant 
   map.addSource('iso', {
     type: 'geojson',
@@ -282,53 +309,20 @@ map.on ('load', function() {
 
 
 map.on('load', () => {
-  
-  //ajout des routes
-  map.addSource('mapbox-streets-v8', {
-    type: 'vector',
-    url: 'mapbox://mapbox.mapbox-streets-v8'
-  });        
-  
-  map.addLayer({
-    "id": "routes",
-    "type": "line",
-    "source": "mapbox-streets-v8",
-    "source-layer": "road",
-    "filter": ["all",  ["in", "class", "primary", "motorway", "secondary", "trunk", "tertiary"]],        
-    "layout": {'visibility': 'visible'},
-    'paint': {'line-color': [
-	    'match',['get', 'class'],
-      'motorway', '#E990A0',
-      'primary', '#FDD7A1',
-      'secondary', '#FDD7A1',
-      'tertiary', '#FEFEFE',
-      'trunk', '#FBC0AC',
-      '#A5A9B0'],
-     'line-width' : 1.5,
-    },
-    minzoom : 5,
-    maxzoom : 20
-  });
-
-  // Fonction pour activer/désactiver la liste déroulante des hôpitaux
-  function toggleDropdown() {
-    document.getElementById("myDropdown").classList.toggle("show");
-  }
-
-  // Fonction pour gérer la sélection d'un hôpital
+  // Fonctions pour les isochrones des SMUR
+  // Fonction pour gérer la sélection d'un SMUR
   function selectHospital(hospitalName) {
     // Récupérer les valeurs sélectionnées pour le profil et la durée
     var selectedProfile = document.querySelector('input[name="profile"]:checked').value;
     var selectedDuration = document.querySelector('input[name="duration"]:checked').value;
-    
     // Vous pouvez ici utiliser les valeurs sélectionnées pour déterminer l'appel à votre API d'isochrone
     console.log("Profil sélectionné :", selectedProfile);
     console.log("Durée sélectionnée :", selectedDuration);
-    console.log("Hôpital sélectionné :", hospitalName);
+    console.log("SMUR sélectionné :", hospitalName);
     // Ajoutez votre logique pour appeler l'API d'isochrone avec les valeurs sélectionnées
   }
 
-  // Ajoutez un événement "click" à chaque élément de la liste des hôpitaux pour gérer la sélection
+  // Ajoutez un événement "click" à chaque élément de la liste des SMUR pour gérer la sélection
   var hospitals = document.querySelectorAll('.dropdown-content .hospital');
   hospitals.forEach(function(hospital) {
     hospital.addEventListener('click', function() {
@@ -336,11 +330,12 @@ map.on('load', () => {
     });
   });
 
+  //SMUR iso
   function toggleDropdown() {
     document.getElementById("myDropdown").classList.toggle("show");
   }
 
-  // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci
+  // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso SMUR)
   window.onclick = function(event) {
       if (!event.target.matches('.dropbtn')) {
           var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -353,106 +348,195 @@ map.on('load', () => {
           }
       }
   }
-// fin du map on
 });
 
-
-//popup hopitaux
-map.on('click', 'hopitaux', function (e) {
-    var coordinates = e.features[0].geometry.coordinates.slice();
-    var description = e.features[0].properties.description;
-    var nomHopital = e.features[0].properties.name; 
-    var telephone = e.features[0].properties.phone; 
-    var site_web = e.features[0].properties.website;
-    var displaySiteWeb = site_web.length > 20 ? site_web.substring(0, 20) + "..." : site_web; /* Le lien hypertexte mais raccourci*/
-  
-  // Créez le contenu HTML pour le popup
-  var popupContent = "<div class='popup'>";
-  popupContent += "<h3>" + nomHopital + "</h3>";
-  popupContent += "<p class='info'>Téléphone : " + telephone +"</p>";
-  popupContent += "<p class='info'>Site Web : <a href='" + site_web + "' target='_blank'>" + displaySiteWeb + "</a></p>";
-  popupContent += "</div>";
-
-  // Créez une popup et attachez-la à l'élément cliqué
-  new mapboxgl.Popup()
-    .setLngLat(coordinates)
-    .setHTML(popupContent)
-    .addTo(map);
-});
-
-map.on('click', 'hopitaux', function (e) {
-  
-  // Fonction pour le menu deroulant + isochrones
-  function fetchHopitaux() {
-    fetch("https://data.opendatasoft.com/api/explore/v2.1/catalog/datasets/osm-fr-lieux-de-soin@babel/exports/geojson?lang=fr&refine=amenity%3A%22hospital%22&refine=emergency%3A%22yes%22&where=(geometry(%60geo_point_2d%60%2C%20geom%27POLYGON((-4.9658203125%2049.001843917978526%2C%20-3.6694335937500004%2049.1314084139986%2C%20-2.4224853515625%2049.31079887964633%2C%20-1.69189453125%2049.30721745093609%2C%20-1.07666015625%2049.26780455063753%2C%20-0.81298828125%2049.0738659012854%2C%20-0.59326171875%2048.65105695744785%2C%20-0.4229736328125%2048.27953734226008%2C%20-0.46142578125%2047.897930761804965%2C%20-0.6317138671874999%2047.720849190702324%2C%20-1.153564453125%2047.35371061951363%2C%20-1.505126953125%2047.18224592701489%2C%20-1.9445800781249998%2047.156104775044035%2C%20-3.8397216796875%2047.34626718205302%2C%20-4.647216796875%2047.502358951968574%2C%20-5.1416015625%2048.085418575511966%2C%20-4.9658203125%2049.001843917978526))%27))&timezone=Europe%2FBerlin")
-      .then(response => response.json())
-      .then(data => {
-        // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
-        generateDropdownOptions(data.features);
-      })
-      .catch(error => {
-        console.error('Une erreur s/'est produite lors de la récupération des données:', error);
-      });
-  }
-
-  // Fonction pour générer les options du menu déroulant à partir des données
-  function generateDropdownOptions(features) {
-    // Récupérer le conteneur du menu déroulant
-    var dropdownContent = document.getElementById("myDropdown");
-    // Parcourir les données
-    features.forEach(feature => {
-      // Créer une option pour chaque élément
-      var option = document.createElement("a");
-      option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
-      option.textContent = feature.properties.name; // Utiliser la valeur du champ 'nom' de chaque feature
-      // Ajouter un gestionnaire d'événements pour le clic sur chaque option
-      option.addEventListener("click", function() {
-        // Récupérer les coordonnées de la fonctionnalité
-        var coordinates = feature.geometry.coordinates;
-        // Appeler la fonction pour créer un isochrone pour cet emplacement
-        createIsochrone(coordinates);
-      });
-      // Ajouter l'option au menu déroulant
-      dropdownContent.appendChild(option);
+// Fonction charger les données des SAMU
+function fetchSAMU() {
+  fetch('./DATA/samuok.geojson')
+    .then(response => response.json())
+    .then(data => {
+      const features = data.features;
+      // Trier les fonctionnalités en fonction du champ 'Ville'
+      features.sort((a, b) => a.properties.Etablissement.localeCompare(b.properties.Etablissement));
+      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
+      generateDropdownOptions(features);
+    })
+    .catch(error => {
+      console.error('Une erreur s est produite lors de la récupération des données:', error);
     });
+}
+// Appeler la fonction pour récupérer les données de la couche "SAMU"
+fetchSAMU();
+
+// Fonction charger les données des SAU
+function fetchSAU() {
+  fetch('./DATA/sauok.geojson')
+    .then(response => response.json())
+    .then(data => {
+      const features = data.features;
+      // Trier les fonctionnalités en fonction du champ 'Ville'
+      features.sort((a, b) => a.properties.Etablissement.localeCompare(b.properties.Etablissement));
+      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
+      generateDropdownOptions(features);      
+    })
+    .catch(error => {
+      console.error('Une erreur s est produite lors de la récupération des données:', error);
+    });
+}
+// Appeler la fonction pour récupérer les données de la couche "SAU"
+fetchSAU();
+
+// Fonction charger les données des SMUR
+function fetchSMUR() {
+  fetch('./DATA/smurok.geojson')
+    .then(response => response.json())
+    .then(data => {
+      const features = data.features;
+      // Trier les fonctionnalités en fonction du champ 'Ville'
+      features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
+      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
+      generateDropdownOptions(features);      
+    })
+    .catch(error => {
+      console.error('Une erreur s est produite lors de la récupération des données:', error);
+    });
+}
+// Appeler la fonction pour récupérer les données de la couche "SAU"
+fetchSMUR();
+
+// Récupérer la source GeoJSON pour la couche SAMU
+const samuSource = map.getSource('SAMU');
+
+// Vérifier si la source existe
+if (samuSource) {
+  const samuData = samuSource.get('Etablissement'); // Récupérer les données GeoJSON de la source
+  const listeRBU = document.getElementById('listeRBU');  // Récupérer l'élément HTML de la liste des couches
+  const samuFieldset = listeRBU.querySelector('.SAMU');  // Récupérer l'élément HTML du champset SAMU
+  const samuContainer = samuFieldset.querySelector('div');  // Récupérer l'élément HTML du conteneur des checkboxes SAMU
+  // Parcourir les fonctionnalités de la couche SAMU
+  samuData.features.forEach(feature => {
+    const checkbox = document.createElement('input');  // Créer un élément HTML pour la checkbox
+    checkbox.type = 'checkbox';
+    checkbox.id = `samu-${feature.properties.Etablissement}`;
+    checkbox.value = feature.properties.Etablissement;
+    checkbox.onchange = () => switchlayer(`SAMU-${feature.properties.Etablissement}`);
+    const label = document.createElement('label');  // Créer un élément HTML pour le libellé de la checkbox
+    label.htmlFor = `samu-${feature.properties.Etablissement}`;
+    label.textContent = feature.properties.Etablissement;
+    samuContainer.appendChild(checkbox);  // Ajouter la checkbox et son libellé au conteneur des checkboxes SAMU
+    samuContainer.appendChild(label);
+  });
+}
+
+//Fonction permettant de cliquer sur la couche pour qu'elle apparait
+switchlayer = function (lname) {
+  if (document.getElementById(lname + "CB").checked) {
+     map.setLayoutProperty(lname, 'visibility', 'visible');
+  } else {
+     map.setLayoutProperty(lname, 'visibility', 'none');
   }
-
-  // Fonction pour créer un isochrone pour un emplacement donné
-  async function createIsochrone(coordinates) {
-    const lon = coordinates[0];
-    const lat = coordinates[1];
-    // Appeler la fonction getIso avec les coordonnées fournies
-    await getIso(lon, lat);
-  }
-
-  // Modifier la fonction getIso pour accepter les coordonnées comme arguments
-  async function getIso(lon, lat) {
-    const query = await fetch(
-      `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
-      { method: 'GET' }
-    );
-    const data = await query.json();
-    // Set the 'iso' source's data to what's returned by the API query
-    map.getSource('iso').setData(data);
-  }
-
-  // Fonction pour mettre à jour les isochrones avec la nouvelle valeur de minutes
-  async function updateIsochrone() {
-    // Récupérer les coordonnées du site olympique sélectionné
-    const lon = feature.hopitaux.geo_point.lon;
-    const lat = feature.hopitaux.geo_point.lat;
-    // Appeler la fonction getIso avec les nouvelles valeurs de lon, lat et minutes
-    await getIso(lon, lat);
-  }
+}
 
 
-  // Appeler la fonction pour récupérer les données de la couche "hopitaux"
-  fetchHopitaux();
 
-  // Fonction pour afficher ou masquer le menu déroulant
-  function toggleDropdown() {
-    var dropdownContent = document.getElementById("myDropdown");
-    dropdownContent.classList.toggle("show");
-  }
+// //popup SMUR
+// map.on('click', 'SMUR', function (e) {
+//   var coordinates = e.features[0].geometry.coordinates.slice();
+//   var description = e.features[0].properties.description;
+//   var nomSMUR = e.features[0].properties.name; 
+//   var telephone = e.features[0].properties.phone; 
+//   var site_web = e.features[0].properties.website;
+//   var displaySiteWeb = site_web.length > 20 ? site_web.substring(0, 20) + "..." : site_web; /* Le lien hypertexte mais raccourci*/
+  
+//   // Créez le contenu HTML pour le popup
+//   var popupContent = "<div class='popup'>";
+//   popupContent += "<h3>" + nomSMUR + "</h3>";
+//   popupContent += "<p class='info'>Téléphone : " + telephone +"</p>";
+//   popupContent += "<p class='info'>Site Web : <a href='" + site_web + "' target='_blank'>" + displaySiteWeb + "</a></p>";
+//   popupContent += "</div>";
 
-});
+//   // Créez une popup et attachez-la à l'élément cliqué
+//   new mapboxgl.Popup()
+//     .setLngLat(coordinates)
+//     .setHTML(popupContent)
+//     .addTo(map);
+// });
+
+
+
+// Bouton permettant de calculer les isochrones sur les SMUR
+// Fonction pour charger les données des SMUR 
+function fetchSMURiso() {
+  fetch('./DATA/smurok.geojson')
+    .then(response => response.json())
+    .then(data => {
+      const features = data.features;
+
+      // Trier les fonctionnalités en fonction du champ 'Ville'
+      features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
+
+      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
+      generateDropdownOptionsIso(features);
+    })
+    .catch(error => {
+      console.error('Une erreur s est produite lors de la récupération des données:', error);
+    });
+}
+// Appeler la fonction pour récupérer les données de la couche "SMUR"
+fetchSMURiso();
+
+// Fonction pour générer les options du menu déroulant à partir des données
+function generateDropdownOptionsIso(features) {
+  // Récupérer le conteneur du menu déroulant
+  var dropdownContent = document.getElementById("myDropdown");
+  // Parcourir les données
+  features.forEach(feature => {
+    // Créer une option pour chaque élément
+    var option = document.createElement("a");
+    option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
+    option.textContent = feature.properties.Ville; // Utiliser la valeur du champ 'nom' de chaque feature
+    // Ajouter un gestionnaire d'événements pour le clic sur chaque option
+    option.addEventListener("click", function() {
+      // Récupérer les coordonnées de la fonctionnalité
+      var coordinates = feature.geometry.coordinates;
+      // Appeler la fonction pour créer un isochrone pour cet emplacement
+      createIsochrone(coordinates);
+    });
+    // Ajouter l'option au menu déroulant
+    dropdownContent.appendChild(option);
+  });
+}
+
+// Fonction pour créer un isochrone pour un emplacement donné
+async function createIsochrone(coordinates) {
+  const lon = coordinates[0];
+  const lat = coordinates[1];
+  // Appeler la fonction getIso avec les coordonnées fournies
+  await getIso(lon, lat);
+}
+
+// Modifier la fonction getIso pour accepter les coordonnées comme arguments
+async function getIso(lon, lat) {
+  const query = await fetch(
+    `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
+    { method: 'GET' }
+  );
+  const data = await query.json();
+  // Set the 'iso' source's data to what's returned by the API query
+  map.getSource('iso').setData(data);
+}
+
+// Fonction pour mettre à jour les isochrones avec la nouvelle valeur de minutes
+async function updateIsochrone() {
+  // Récupérer les coordonnées du site olympique sélectionné
+  const lon = feature.SMUR.geo_point.lon;
+  const lat = feature.SMUR.geo_point.lat;
+  // Appeler la fonction getIso avec les nouvelles valeurs de lon, lat et minutes
+  await getIso(lon, lat);
+}
+
+// Fonction pour afficher ou masquer le menu déroulant des isochrones SMUR
+function toggleDropdown() {
+  var dropdownContent = document.getElementById("myDropdown");
+  dropdownContent.classList.toggle("show");
+}
