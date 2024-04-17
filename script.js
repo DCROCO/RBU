@@ -25,7 +25,7 @@ map.addControl(geocoder);
 
 // Fonction pour calculer et afficher l'isochrone
 function calculateIsochrone(center, minutes) {
-    fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving/' + center.join(',') + '?contours_minutes=' + minutes + '&polygons=true&access_token=' + mapboxgl.accessToken)
+    fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.join(',') + '?contours_minutes=' + minutes + '&polygons=true&access_token=' + mapboxgl.accessToken)
         .then(response => response.json())
         .then(data => {
             // Supprimer la couche d'isochrone existante s'il y en a une

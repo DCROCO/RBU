@@ -118,11 +118,11 @@
 
 /*Style de la liste des couches*/
 .ListeUrgence {
-  font: 11px/13px 'Montserrat', Arial, Helvetica, sans-serif;
+  font: 12px 'Montserrat', Arial, Helvetica, sans-serif;
   color: white;
   position: absolute;
   width: 240px;
-  top: 60px;
+  top: 140px;
   right: 10px;
 }
 
@@ -144,4 +144,18 @@
   display: block;
   font-weight: bold;
   margin: 0 0 5px;
+}
+
+.config-panel{
+  position: absolute; 
+  font: 13px 'Montserrat', Arial, Helvetica, sans-serif;
+  top: 50px; 
+  box-shadow:0 10px 15px rgba(0, 0, 0, 0.10);
+  right: 10px; 
+  border-radius: 8px;
+  width : 240px;
+  color: rgb(56, 56, 56);
+  background-color: white; 
+  padding: 10px; 
+  border: 1px solid #ccc;
 }
