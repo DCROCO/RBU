@@ -23,30 +23,35 @@ var geocoder = new MapboxGeocoder({
 });
 map.addControl(geocoder);
 
-// Fonction pour calculer et afficher l'isochrone
 function calculateIsochrone(center, minutes) {
-    fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.join(',') + '?contours_minutes=' + minutes + '&polygons=true&access_token=' + mapboxgl.accessToken)
-        .then(response => response.json())
-        .then(data => {
-            // Supprimer la couche d'isochrone existante s'il y en a une
-            if (map.getSource('isochrone')) {
-                map.removeLayer('isochrone');
-                map.removeSource('isochrone');
-            }
-            // Ajouter la nouvelle couche d'isochrone
-            map.addLayer({
-                id: 'isochrone',
-                type: 'fill',
-                source: {
-                    type: 'geojson',
-                    data: data
-                },
-                paint: {
-                    'fill-color': '#f00',
-                    'fill-opacity': 0.5
-                }
-            });
-        });
+  fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.join(',') + '?contours_minutes=' + minutes + '&polygons=true&access_token=' + mapboxgl.accessToken)
+      .then(response => response.json())
+      .then(data => {
+          // Supprimer la couche d'isochrone existante s'il y en a une
+          if (map.getSource('isochrone')) {
+              map.removeLayer('isochrone');
+              map.removeSource('isochrone');
+          }
+          // Ajouter la nouvelle couche d'isochrone
+          map.addLayer({
+              id: 'isochrone',
+              type: 'fill',
+              source: {
+                  type: 'geojson',
+                  data: data
+              },
+              paint: {
+                  'fill-color': '#f00',
+                  'fill-opacity': 0.5
+              }
+          });
+          // Effectuer le "fly to" vers les coordonnées du centre avec un zoom personnalisé
+          map.flyTo({
+              center: center,
+              zoom: 10, // Ajuster le niveau de zoom selon vos besoins
+              speed: 0.5 // Ajuster la vitesse d'animation selon vos besoins
+          });
+      });
 }
 
 // Utilisation de la fonction calculateIsochrone lorsque l'adresse est sélectionnée
@@ -307,33 +312,54 @@ map.on ('load', function() {
   getIso();
 });
 
+// Fonction pour gérer la sélection d'un SMUR
+function selectsmuriso(smurName) {
+  // Récupérer les valeurs sélectionnées pour le profil et la durée
+  var selectedProfile = document.querySelector('input[name="profile"]:checked').value;
+  var selectedDuration = document.querySelector('input[name="duration"]:checked').value;
+  // Vous pouvez ici utiliser les valeurs sélectionnées pour déterminer l'appel à votre API d'isochrone
+  console.log("Profil sélectionné :", selectedProfile);
+  console.log("Durée sélectionnée :", selectedDuration);
+  console.log("SMUR sélectionné :", smurName);
+  // Ajoutez votre logique pour appeler l'API d'isochrone avec les valeurs sélectionnées
+}
+
+// SMUR iso
+function toggleDropdownIso() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Fonction pour générer les options du menu déroulant à partir des données
+function generateDropdownOptionsIso(data) {
+  // Récupérer le conteneur du menu déroulant
+  var dropdownContent = document.getElementById("myDropdown");
+  // Parcourir les données
+  data.features.forEach(feature => {
+    // Créer une option pour chaque élément
+    var option = document.createElement("a");
+    option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
+    option.textContent = feature.properties.Ville; // Utiliser la valeur du champ 'nom' de chaque feature
+    option.classList.add('smuriso'); // Ajouter la classe 'smuriso' à chaque élément
+    // Ajouter un gestionnaire d'événements pour le clic sur chaque option
+    option.addEventListener("click", function() {
+      // Récupérer les coordonnées de la fonctionnalité
+      var coordinates = feature.geometry.coordinates;
+      // Appeler la fonction pour créer un isochrone pour cet emplacement
+      createIsochrone(coordinates);
+    });
+    // Ajouter l'option au menu déroulant
+    dropdownContent.appendChild(option);
+  });
+}
 
 map.on('load', () => {
-  // Fonctions pour les isochrones des SMUR
-  // Fonction pour gérer la sélection d'un SMUR
-  function selectHospital(hospitalName) {
-    // Récupérer les valeurs sélectionnées pour le profil et la durée
-    var selectedProfile = document.querySelector('input[name="profile"]:checked').value;
-    var selectedDuration = document.querySelector('input[name="duration"]:checked').value;
-    // Vous pouvez ici utiliser les valeurs sélectionnées pour déterminer l'appel à votre API d'isochrone
-    console.log("Profil sélectionné :", selectedProfile);
-    console.log("Durée sélectionnée :", selectedDuration);
-    console.log("SMUR sélectionné :", hospitalName);
-    // Ajoutez votre logique pour appeler l'API d'isochrone avec les valeurs sélectionnées
-  }
-
   // Ajoutez un événement "click" à chaque élément de la liste des SMUR pour gérer la sélection
-  var hospitals = document.querySelectorAll('.dropdown-content .hospital');
-  hospitals.forEach(function(hospital) {
-    hospital.addEventListener('click', function() {
-      selectHospital(hospital.textContent);
+  var smursiso = document.querySelectorAll('.dropdown-content .smuriso');
+  smursiso.forEach(function(smuriso) {
+    smuriso.addEventListener('click', function() {
+      selectsmuriso(smuriso.textContent);
     });
   });
-
-  //SMUR iso
-  function toggleDropdown() {
-    document.getElementById("myDropdown").classList.toggle("show");
-  }
 
   // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso SMUR)
   window.onclick = function(event) {
@@ -348,85 +374,26 @@ map.on('load', () => {
           }
       }
   }
+
+  // Bouton permettant de calculer les isochrones sur les SMUR
+  // Fonction pour charger les données des SMUR
+  function fetchSMURiso() {
+    fetch('./DATA/smurok.geojson')
+      .then(response => response.json())
+      .then(data => {
+        // Trier les fonctionnalités en fonction du champ 'Ville'
+        data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
+        // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
+        generateDropdownOptionsIso(data);
+      })
+      .catch(error => {
+        console.error('Une erreur s est produite lors de la récupération des données:', error);
+      });
+  }
+  // Appeler la fonction pour récupérer les données de la couche "SMUR"
+  fetchSMURiso();
 });
 
-// Fonction charger les données des SAMU
-function fetchSAMU() {
-  fetch('./DATA/samuok.geojson')
-    .then(response => response.json())
-    .then(data => {
-      const features = data.features;
-      // Trier les fonctionnalités en fonction du champ 'Ville'
-      features.sort((a, b) => a.properties.Etablissement.localeCompare(b.properties.Etablissement));
-      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
-      generateDropdownOptions(features);
-    })
-    .catch(error => {
-      console.error('Une erreur s est produite lors de la récupération des données:', error);
-    });
-}
-// Appeler la fonction pour récupérer les données de la couche "SAMU"
-fetchSAMU();
-
-// Fonction charger les données des SAU
-function fetchSAU() {
-  fetch('./DATA/sauok.geojson')
-    .then(response => response.json())
-    .then(data => {
-      const features = data.features;
-      // Trier les fonctionnalités en fonction du champ 'Ville'
-      features.sort((a, b) => a.properties.Etablissement.localeCompare(b.properties.Etablissement));
-      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
-      generateDropdownOptions(features);      
-    })
-    .catch(error => {
-      console.error('Une erreur s est produite lors de la récupération des données:', error);
-    });
-}
-// Appeler la fonction pour récupérer les données de la couche "SAU"
-fetchSAU();
-
-// Fonction charger les données des SMUR
-function fetchSMUR() {
-  fetch('./DATA/smurok.geojson')
-    .then(response => response.json())
-    .then(data => {
-      const features = data.features;
-      // Trier les fonctionnalités en fonction du champ 'Ville'
-      features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
-      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
-      generateDropdownOptions(features);      
-    })
-    .catch(error => {
-      console.error('Une erreur s est produite lors de la récupération des données:', error);
-    });
-}
-// Appeler la fonction pour récupérer les données de la couche "SAU"
-fetchSMUR();
-
-// Récupérer la source GeoJSON pour la couche SAMU
-const samuSource = map.getSource('SAMU');
-
-// Vérifier si la source existe
-if (samuSource) {
-  const samuData = samuSource.get('Etablissement'); // Récupérer les données GeoJSON de la source
-  const listeRBU = document.getElementById('listeRBU');  // Récupérer l'élément HTML de la liste des couches
-  const samuFieldset = listeRBU.querySelector('.SAMU');  // Récupérer l'élément HTML du champset SAMU
-  const samuContainer = samuFieldset.querySelector('div');  // Récupérer l'élément HTML du conteneur des checkboxes SAMU
-  // Parcourir les fonctionnalités de la couche SAMU
-  samuData.features.forEach(feature => {
-    const checkbox = document.createElement('input');  // Créer un élément HTML pour la checkbox
-    checkbox.type = 'checkbox';
-    checkbox.id = `samu-${feature.properties.Etablissement}`;
-    checkbox.value = feature.properties.Etablissement;
-    checkbox.onchange = () => switchlayer(`SAMU-${feature.properties.Etablissement}`);
-    const label = document.createElement('label');  // Créer un élément HTML pour le libellé de la checkbox
-    label.htmlFor = `samu-${feature.properties.Etablissement}`;
-    label.textContent = feature.properties.Etablissement;
-    samuContainer.appendChild(checkbox);  // Ajouter la checkbox et son libellé au conteneur des checkboxes SAMU
-    samuContainer.appendChild(label);
-  });
-}
 
 //Fonction permettant de cliquer sur la couche pour qu'elle apparait
 switchlayer = function (lname) {
@@ -463,56 +430,19 @@ switchlayer = function (lname) {
 // });
 
 
-
-// Bouton permettant de calculer les isochrones sur les SMUR
-// Fonction pour charger les données des SMUR 
-function fetchSMURiso() {
-  fetch('./DATA/smurok.geojson')
-    .then(response => response.json())
-    .then(data => {
-      const features = data.features;
-
-      // Trier les fonctionnalités en fonction du champ 'Ville'
-      features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
-
-      // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
-      generateDropdownOptionsIso(features);
-    })
-    .catch(error => {
-      console.error('Une erreur s est produite lors de la récupération des données:', error);
-    });
-}
-// Appeler la fonction pour récupérer les données de la couche "SMUR"
-fetchSMURiso();
-
-// Fonction pour générer les options du menu déroulant à partir des données
-function generateDropdownOptionsIso(features) {
-  // Récupérer le conteneur du menu déroulant
-  var dropdownContent = document.getElementById("myDropdown");
-  // Parcourir les données
-  features.forEach(feature => {
-    // Créer une option pour chaque élément
-    var option = document.createElement("a");
-    option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
-    option.textContent = feature.properties.Ville; // Utiliser la valeur du champ 'nom' de chaque feature
-    // Ajouter un gestionnaire d'événements pour le clic sur chaque option
-    option.addEventListener("click", function() {
-      // Récupérer les coordonnées de la fonctionnalité
-      var coordinates = feature.geometry.coordinates;
-      // Appeler la fonction pour créer un isochrone pour cet emplacement
-      createIsochrone(coordinates);
-    });
-    // Ajouter l'option au menu déroulant
-    dropdownContent.appendChild(option);
-  });
-}
-
 // Fonction pour créer un isochrone pour un emplacement donné
 async function createIsochrone(coordinates) {
   const lon = coordinates[0];
   const lat = coordinates[1];
   // Appeler la fonction getIso avec les coordonnées fournies
   await getIso(lon, lat);
+       
+  // Effectuer le "fly to" vers les coordonnées sélectionnées
+  map.flyTo({
+    center: coordinates,
+    zoom: 9, // Vous pouvez ajuster le niveau de zoom selon vos besoins
+    speed: 0.8 // Vous pouvez ajuster la vitesse d'animation selon vos besoins
+  }); 
 }
 
 // Modifier la fonction getIso pour accepter les coordonnées comme arguments

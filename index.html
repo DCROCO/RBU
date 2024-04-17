@@ -57,37 +57,14 @@
     </div>
     
     <div class="dropdown">
-        <button onclick="toggleDropdown()" class="dropbtn">Couverture des SMUR</button>
+        <button onclick="toggleDropdownIso()" class="dropbtn">Couverture des SMUR</button>
         <div id="myDropdown" class="dropdown-content">
         </div>
     </div>
-    
+
     <div class='ListeUrgence'>
-        <div class="listeRBU-content">
-          <hr>
-            <fieldset>
-              <label class="categorylabel">SAMU</label>
-                <div>
-                  <input type="checkbox" id="SAMUCB" value="SAMU" onchange="switchlayer('SAMU')" />
-                  <label for="SAMUCB">Tout sélectionner</label>
-               </div>
-            </fieldset>
-          <hr>
-            <fieldset>
-              <label class="categorylabel">SAU</label>
-                <div>
-                  <input type="checkbox" id="SAUCB" value="SAU" onchange="switchlayer('SAU')" />
-                  <label for="SAUCB">Tout sélectionner</label>
-                </div>
-            </fieldset>
-          <hr>
-            <fieldset>
-              <label class="categorylabel">SMUR</label>
-                <div>
-                  <input type="checkbox" id="SMURCB" value="SMUR" onchange="switchlayer('SMUR')" checked/>
-                  <label for="SMURCB">Tout sélectionner</label>
-                </div>
-            </fieldset>
+        <button onclick="toggleDropdownList()" class="ListeUrgencebtn">Liste des SMUR</button>
+        <div id="listUrg" class="listeRBU-content">
         </div>
     </div>
 

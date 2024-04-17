@@ -42,6 +42,7 @@
 }
 
 
+
 /* style liste deroulante */
 .dropbtn {
   background-color: #f2a11f;
@@ -98,6 +99,13 @@
   display:block;
 }
 
+/*position de la popup menu deroulant*/
+.delete {
+  position: absolute;
+  top: 240px; /* Align to the top with 20px offset */
+  left: 270px; /* Align to the left with 20px offset */
+}
+
 /* style liste deroulante */
 .ListeUrgencebtn {
   font: 20px 'Montserrat', Arial, Helvetica, sans-serif;
@@ -111,27 +119,20 @@
 }
 
 /*couleur de fond lorsque l'on passe sur la liste deroulante*/
-.dropbtn:hover, .dropbtn:focus {
+.ListeUrgencebtn:hover, .ListeUrgencebtn:focus {
   background-color: #b57205;
 }
-
 
 /*Style de la liste des couches*/
 .ListeUrgence {
   font: 12px 'Montserrat', Arial, Helvetica, sans-serif;
-  color: white;
+  color: black;
   position: absolute;
   width: 240px;
   top: 140px;
   right: 10px;
-}
-
-.ListeUrgence .listeRBU-content {
-  background-color: #f2a221cc;
-  box-shadow:0 10px 15px rgba(0, 0, 0, 0.10);
+  box-shadow:0 10px 10px rgba(0, 0, 0, 0.10);
   border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
 }
 
 .listeRBU-content fieldset {
