@@ -42,7 +42,6 @@
 }
 
 
-
 /* style liste deroulante */
 .dropbtn {
   background-color: #f2a11f;
@@ -63,8 +62,12 @@
 /*position de la popup menu deroulant*/
 .dropdown {
   position: absolute;
-  top: 230px; /* Align to the top with 20px offset */
-  left: 21px; /* Align to the left with 20px offset */
+  top: 0; 
+  left: 100%;
+}
+
+.dropdown-container {
+  position: relative;
 }
 
 /* Liste déroulante */
@@ -99,52 +102,62 @@
   display:block;
 }
 
-/*position de la popup menu deroulant*/
-.delete {
-  position: absolute;
-  top: 240px; /* Align to the top with 20px offset */
-  left: 270px; /* Align to the left with 20px offset */
-}
-
 /* style liste deroulante */
-.ListeUrgencebtn {
-  font: 20px 'Montserrat', Arial, Helvetica, sans-serif;
-  background-color: #f2a221;
+.droplist {
+  background-color: #f2a11f;
   color: white;
   padding: 10px 10px;
+  font-size: 20px;
   border-radius: 5px;
   border: none;
-  width : 250px;
+  width : 280px;
   text-align: center;
 }
 
 /*couleur de fond lorsque l'on passe sur la liste deroulante*/
-.ListeUrgencebtn:hover, .ListeUrgencebtn:focus {
+.droplist:hover, .droplist:focus {
   background-color: #b57205;
 }
 
-/*Style de la liste des couches*/
-.ListeUrgence {
-  font: 12px 'Montserrat', Arial, Helvetica, sans-serif;
-  color: black;
+/*position de la popup menu deroulant*/
+#layerList {
   position: absolute;
-  width: 240px;
-  top: 140px;
-  right: 10px;
-  box-shadow:0 10px 10px rgba(0, 0, 0, 0.10);
-  border-radius: 10px;
+  bottom: 10px; 
+  right: 100%; 
 }
 
-.listeRBU-content fieldset {
-  border: none;
-  padding: 0;
-  margin: 0 0 10px;
+#layerListContent {
+  background-color: #f9f9f9;
+  max-height: 300px; /* Hauteur maximale de la liste déroulante */
+  overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
+
 }
 
-.listeRBU-content .categoryLabel {
+/* Liste déroulante */
+.hidden {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  max-height: 300px; /* Hauteur maximale de la liste déroulante */
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  left: 0; /* Align to the left */
+  width : 240px;
+}
+
+/* noms des smur dans la liste déroulante */
+.hidden a {
+  color: black;
+  padding: 10px 10px;
+  text-decoration: none;
+  font: 8px 'Montserrat', Arial, Helvetica, sans-serif;
   display: block;
-  font-weight: bold;
-  margin: 0 0 5px;
+}
+
+/* Change color of dropdown links on hover */
+.hidden a:hover {
+  background-color: #f2a11f;
 }
 
 .config-panel{
@@ -159,4 +172,98 @@
   background-color: white; 
   padding: 10px; 
   border: 1px solid #ccc;
+}
+
+/* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
+.show2 {
+  display:block;
+}
+
+/*Définition de la fenetre du menu*/
+.menu {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 100%;
+  background-color: white ;
+  border-right: 2px solid #f2a221;
+  transition: left 0.3s ease;
+  overflow-x: hidden;
+  z-index: 1000;
+  padding-top: 10px;
+}
+
+/*Gestion du titre du menu*/
+.titre-menu {
+  padding: 5px 5px;
+  color: #f2a221;
+  font-weight: bolder;
+}
+
+/*Définition des bontons de fermeture et d'ouverture du menu */
+.openbtn {
+  cursor: pointer;
+  padding: 10px 10px;
+  border: none;
+  position: fixed;
+  background-color: transparent;
+  top: 0px;
+  left: 20px;
+  width: 60px; /* Largeur du bouton */
+  height: 60px; /* Hauteur du bouton */
+  transition: left 0.3s ease;
+}
+.menu .closebtn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  margin-left: 50px;
+  width: 40px; /* Largeur du bouton */
+  height: 40px; /* Hauteur du bouton */
+  transition: left 0.3s ease;
+}
+
+/* Style des traits des boutons d'ouvrir et fermeture du menu*/
+#menu-icon span{
+  height:2px;
+  background: #f2a221;
+  margin-bottom:5px;
+  display:block;
+}
+#menu-icon span:nth-child(2){
+  width:75%;
+}
+#menu-icon span:nth-child(3){
+  width:50%;
+}
+
+/*Gestion des élements du menu*/
+.menu-items {
+  text-align: center;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+/*Gestion des titres des élements du menu*/
+.menu-items h4 { 
+  padding: 5px 40px;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+/*Gestion des titres des élements du menu*/
+.menu-items h1 {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+.toggle-container{
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+}
+/*Gestion des barres qui sépare les groupe d'élements*/
+.menu-items h5 {
+  color: #f2a221;
+}
+/*Gestion de la petite barre qui sépare 2 élements du meme groupe*/
+.menu-items h6 {
+  color: #f2a221;
+  position: center;
+  margin: 0;
 }
