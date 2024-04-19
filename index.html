@@ -22,51 +22,88 @@
 <script src='https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.js'></script>
 <script src='https://api.mapbox.com/mapbox.js/plugins/mapbox-isochrone/v1.0.0/mapbox-isochrone.js'></script>
 
+<script> function openNav() {
+    document.getElementById("menu").style.width = "250px";
+  }</script>
+  
+  <script> function closeNav() {
+    document.getElementById("menu").style.width = "0";
+  }</script>
+
+
 <body>
     <div id='map'>
     </div>
-    <div class='absolute fl my24 mx24 py24 px24 bg-gray-faint round'>
-        <form id='params'>
-            <h4 class='txt-m txt-bold mb6'>Choisir un mode :</h4>
-            <div class='mb12 mr12 toggle-group align-center'>
-                <label class='toggle-container'>
-                    <input name='profile' type='radio' value='walking'>
-                    <div class='toggle toggle--active-null toggle--null'>HELISMUR</div>
-                </label>
-                <label class='toggle-container'>
-                    <input name='profile' type='radio' value='driving'>
-                    <div class='toggle toggle--active-null toggle--null'>SMUR VL</div>
-                </label>
+    <div id="menu" class='menu'>
+        <h3>Menu des couches</h3>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
+          <div id="menu-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </a>
+        <div id="menu-items" class="menu-items">
+          <h5>__________________________________________________________</h5>
+          <h4>Couverture des SMUR</h4>
+          <div class="dropdown-container">
+              <button onclick="toggleDropdownIso()" class="dropbtn">Choix du SMUR</button>
+              <div id="myDropdown" class="dropdown-content">
+              </div>
+          </div>
+            <form id='params'>
+              <h6>____________</h6>
+              <h4 class='dropdown-container'>Options pour le calcul d'isochrones</h4>
+                <h1 class='txt-m txt-light mb6'>Choisir un mode :</h1>
+                <div class='mb12 mr12 toggle-group align-center'>
+                    <label class='toggle-container'>
+                        <input name='profile' type='radio' value='walking'>
+                        <div class='toggle toggle--active-null toggle--null'>HELISMUR</div>
+                    </label>
+                    <label class='toggle-container'>
+                        <input name='profile' type='radio' value='driving'>
+                        <div class='toggle toggle--active-null toggle--null'>SMUR VL</div>
+                    </label>
+                </div>
+                <h1 class='txt-m txt-light mb6'>Choisir une durée:</h1>
+                <div class='mb12 mr12 toggle-group align-center'>
+                    <label class='toggle-container'>
+                        <input name='duration' type='radio' value='30' checked>
+                        <div class='toggle toggle--active-null toggle--null'>30 min</div>
+                    </label>
+                    <label class='toggle-container'>
+                        <input name='duration' type='radio' value='45'>
+                        <div class='toggle toggle--active-null toggle--null'>45 min</div>
+                    </label>
+                    <label class='toggle-container'>
+                        <input name='duration' type='radio' value='60'>
+                        <div class='toggle toggle--active-null toggle--null'>60 min</div>
+                    </label>
+                </div>
+            </form>
+            <h5>__________________________________________________________</h5>
+            <h4 class="ListeUrgence-container">Sélection d'un SMUR</h4>
+            <div id="layerList">
+                <button onclick="toggleLayerList()" class="droplist">Afficher/masquer les couches</button>
+                <div id="layerListContent" class="hidden">
+                <h4>SAU</h4>
+                <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">Afficher/masquer tous les SAU
+                <h4>SMUR</h4>
+                <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>Afficher/masquer tous les SMUR
+                <div id="smurList"></div>
+                </div>
             </div>
-            <h4 class='txt-m txt-bold mb6'>Choisir une durée:</h4>
-            <div class='mb12 mr12 toggle-group align-center'>
-                <label class='toggle-container'>
-                    <input name='duration' type='radio' value='30' checked>
-                    <div class='toggle toggle--active-null toggle--null'>30 min</div>
-                </label>
-                <label class='toggle-container'>
-                    <input name='duration' type='radio' value='45'>
-                    <div class='toggle toggle--active-null toggle--null'>45 min</div>
-                </label>
-                <label class='toggle-container'>
-                    <input name='duration' type='radio' value='60'>
-                    <div class='toggle toggle--active-null toggle--null'>60 min</div>
-                </label>
-            </div>
-        </form>
-    </div>
-    
-    <div class="dropdown">
-        <button onclick="toggleDropdownIso()" class="dropbtn">Couverture des SMUR</button>
-        <div id="myDropdown" class="dropdown-content">
         </div>
-    </div>
+    </div>   
+</div>
+<button class="openbtn" onclick="openNav()">
+  <div id="menu-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</button>
 
-    <div class='ListeUrgence'>
-        <button onclick="toggleDropdownList()" class="ListeUrgencebtn">Liste des SMUR</button>
-        <div id="listUrg" class="listeRBU-content">
-        </div>
-    </div>
 
     <div class="config-panel">
         <label for="isochrone-time-select">Choisir le temps :</label>

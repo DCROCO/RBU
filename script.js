@@ -1,4 +1,10 @@
-// Définition du fond de carte (chemin vers mapbox)
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// DEFINITION DE LA CARTE /////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Chemin vers mapbox
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGNyb2NvIiwiYSI6ImNsc2tkdDhtMTAyaGYyd253c2I5Z3hrc2UifQ.5BLIcpfsRJ5OpRYex0y6PQ';
 
 // Ajout de la carte
@@ -13,85 +19,13 @@ var map = new mapboxgl.Map({
 });
 
 
-// Configuration des fonctions
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// AJOUT DES DONNEES //////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Boite de recherche d'adresses créée par Mapbox et accessible via leur site qui permet d'avoir accès à la base d'adresse nationale
-var geocoder = new MapboxGeocoder({
-    accessToken: mapboxgl.accessToken, //chemin vers mapbox
-    mapboxgl: mapboxgl,
-    container: 'contener'
-});
-map.addControl(geocoder);
-
-function calculateIsochrone(center, minutes) {
-  fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.join(',') + '?contours_minutes=' + minutes + '&polygons=true&access_token=' + mapboxgl.accessToken)
-      .then(response => response.json())
-      .then(data => {
-          // Supprimer la couche d'isochrone existante s'il y en a une
-          if (map.getSource('isochrone')) {
-              map.removeLayer('isochrone');
-              map.removeSource('isochrone');
-          }
-          // Ajouter la nouvelle couche d'isochrone
-          map.addLayer({
-              id: 'isochrone',
-              type: 'fill',
-              source: {
-                  type: 'geojson',
-                  data: data
-              },
-              paint: {
-                  'fill-color': '#f00',
-                  'fill-opacity': 0.5
-              }
-          });
-          // Effectuer le "fly to" vers les coordonnées du centre avec un zoom personnalisé
-          map.flyTo({
-              center: center,
-              zoom: 10, // Ajuster le niveau de zoom selon vos besoins
-              speed: 0.5 // Ajuster la vitesse d'animation selon vos besoins
-          });
-      });
-}
-
-// Utilisation de la fonction calculateIsochrone lorsque l'adresse est sélectionnée
-geocoder.on('result', function(ev) {
-    var center = ev.result.center; // Centre de l'adresse sélectionnée
-    var selectedTime = document.getElementById('isochrone-time-select').value;
-    calculateIsochrone(center, selectedTime);
-});
-
-// Événement de changement de temps dans la menu déroulante de configuration
-document.getElementById('isochrone-time-select').addEventListener('change', function() {
-    var selectedTime = this.value;
-    var selectedAddress = geocoder.getSelectedItem();
-    if (selectedAddress) {
-        var center = selectedAddress.geometry.coordinates;
-        calculateIsochrone(center, selectedTime);
-    }
-});
-
-// Supprimer l'isochrone lorsque l'adresse est désélectionnée
-geocoder.on('clear', function() {
-    if (map.getSource('isochrone')) {
-        map.removeLayer('isochrone');
-        map.removeSource('isochrone');
-    }
-});
-
-//isochrones pour le menu deroulant QUOI?
-var params = document.getElementById('params');
-var urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
-var lon = -1.68;
-var lat = 48.12;
-var profile = 'driving';
-var minutes = 30;
-// var minutes = 45;
-// var minutes = 60;
-
-
-// Ajout des données grâce à la fonction map.on 
-// Les 3 principaux jeux de données: SMUR, SAMU et SAU
+// Les 3 principaux jeux de données: smur, SAMU et sau
 map.on ('load', function() {
     
   //Ajout des contours de la Bretagne
@@ -146,17 +80,18 @@ map.on ('load', function() {
       'secondary', '#FDD7A1',
       'tertiary', '#FEFEFE',
       'trunk', '#FBC0AC',
-      '#A5A9B0'], 'line-width' : 1.5,
+      '#A5A9B0'], 
+    'line-width' : 1.5,
     }
   });
 
-  //Ajout des SMUR
-  map.addSource('source_SMUR', {
-    'type': 'geojson',
-    'data': './DATA/smurok.geojson'
+  //Ajout des smur
+  map.addSource('source_smur', {
+    type: 'geojson',
+    data: './DATA/smurok.geojson'
   });
-  
-  //Icones des points SMUR
+
+  //Icones des points smur
   map.loadImage('./DATA/SMUR.png', function(error, image) {
     if (error) throw error;
     map.addImage('custom-marker-1', image);
@@ -174,11 +109,11 @@ map.on ('load', function() {
     map.addImage('custom-marker-4', image);
   });
 
-  //Chargement de la couche SMUR
+  // chargement des données smur
   map.addLayer({
-    'id': 'SMUR',
+    'id': 'smur',
     'type': 'symbol',
-    'source': 'source_SMUR',
+    'source': 'source_smur',
     'layout': {
       'icon-image': ['match', ['get', 'field_1'], 
                      'SMUR Bretagne', 'custom-marker-1', 
@@ -191,6 +126,7 @@ map.on ('load', function() {
       'visibility': 'visible'
     } 
   });
+
 
   //Ajout des SAMU 
   map.addSource('source_SAMU', {
@@ -215,8 +151,8 @@ map.on ('load', function() {
     }
   });
 
-  //Ajout des SAU bretons
-  map.addSource('source_SAU', {
+  //Ajout des sau bretons
+  map.addSource('source_sau', {
     'type': 'geojson',
     'data': './DATA/sauok.geojson'
   });
@@ -235,9 +171,9 @@ map.on ('load', function() {
   });
 
   map.addLayer({
-    'id': 'SAU',
+    'id': 'sau',
     'type': 'symbol',
-    'source': 'source_SAU',
+    'source': 'source_sau',
     'layout': {
       'icon-image': ['match', ['get', 'Statut'], 
                      'privé', 'custom-marker-a', 
@@ -250,16 +186,16 @@ map.on ('load', function() {
     }
   });
 
-  //Ajout des SAU limitrophes
-  map.addSource('source_SAUlim', {
+  //Ajout des sau limitrophes
+  map.addSource('source_saulim', {
     'type': 'geojson',
-    'data': './DATA/sau_limitrook.geojson'
+    'data': './DATA/sau_limitrophesok.geojson'
   });
 
   map.addLayer({
-    'id': 'SAU_lim',
+    'id': 'sau_lim',
     'type': 'symbol',
-    'source': 'source_SAU2',
+    'source': 'source_saulim',
     'layout': {
       'icon-image': ['match', ['get', 'Statut'], 
                      'privé', 'custom-marker-a', 
@@ -312,7 +248,130 @@ map.on ('load', function() {
   getIso();
 });
 
-// Fonction pour gérer la sélection d'un SMUR
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// CODE POUR LISTER LES SMUR ///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+map.on('load', () => {
+  // Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
+  var smurs = document.querySelectorAll('.hidden .smur');
+  smurs.forEach(function(smur) {
+    smur.addEventListener('click', function() {
+      selectsmuriso(smur.textContent);
+    });
+  });
+
+  // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso smur)
+  window.onclick = function(event) {
+      if (!event.target.matches('.droplist')) {
+          var layerList = document.getElementsByClassName("hidden");
+          var i;
+          for (i = 0; i < layerList.length; i++) {
+              var openlayerList = dropdowns[i];
+              if (openlayerList.classList.contains('show2')) {
+                  openlayerList.classList.remove('show2');
+              }
+          }
+      }
+  }
+
+// Utilisez la fonction fetch() pour récupérer les données SMUR à partir de l'URL
+fetch(smurUrl)
+.then((response) => response.json())
+.then((data) => {
+  smurData = data; // Attribuer la valeur de data à smurData
+  // Trier les fonctionnalités en fonction du champ 'Ville'
+  data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
+  generatesmurOptions(data);
+  console.log("smurData:", smurData);
+})
+.catch((error) => {
+  console.error(error);
+});
+
+}); 
+
+// Fonction pour basculer l'affichage de la liste déroulante
+function toggleLayerList() {
+  const layerListContent = document.getElementById("layerListContent");
+  layerListContent.classList.toggle("hidden");
+}
+
+// Fonction pour basculer l'affichage d'une couche spécifique (SAMU ou sau)
+function toggleLayer(layerId, visible) {
+  const layer = map.getLayer(layerId);
+  if (layer) {
+    const newVisibility = visible ? 'visible' : 'none';
+    map.setLayoutProperty(layerId, 'visibility', newVisibility);
+  }
+}
+
+// Fonction pour générer les options du menu déroulant pour les smur
+function generatesmurOptions(smurData) {
+  const smurList = document.getElementById("smurList");
+  smurData.features.forEach(feature => {
+    if (feature.properties.fid) { // Vérifiez si la propriété fid existe
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = `smur-${feature.properties.fid}`;
+      checkbox.onchange = () => togglesmur(feature.properties.fid, checkbox.checked);
+      const label = document.createElement("label");
+      label.htmlFor = `smur-${feature.properties.fid}`;
+      label.textContent = feature.properties.Ville;
+      smurList.appendChild(checkbox);
+      smurList.appendChild(label);
+      smurList.appendChild(document.createElement("br"));
+    }
+  });
+}
+
+// //Fonction pour afficher/masquer un SMUR spécifique
+// function togglesmur(smurId, visible) {
+//   const filter = ['==', 'fid', smurId];
+//   map.setFilter('smur', visible ? filter : ['==', 'fid', '']);
+//   const feature = smurData.features.find(f => f.properties.fid === smurId);
+//   map.jumpTo({ center: feature.geometry.coordinates });
+// }
+
+// Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
+var smurs = document.querySelectorAll('.hidden .smur');
+smurs.forEach(function(smur) {
+  smur.addEventListener('click', function() {
+    selectsmur(smur.textContent);
+  });
+});
+
+// Fonction pour afficher/masquer tous les SMUR
+const smurCheckbox = document.getElementById("smurLayer");
+smurCheckbox.addEventListener("change", function () {
+  const visible = smurCheckbox.checked;
+  map.setFilter('smur', visible);
+});
+
+// Fonction pour afficher/masquer tous les sau
+const sauCheckbox = document.getElementById("sauLayer");
+sauCheckbox.addEventListener("change", function () {
+  const visible = sauCheckbox.checked;
+  toggleLayer("sau", visible);
+});
+
+
+let smurData;
+// Récupérez l'URL du fichier GeoJSON à partir de l'objet source SMUR
+const smurUrl = './DATA/smurok.geojson';
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// CODE POUR CALCULER LES COUVERTURES DU SMUR /////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Fonction pour gérer la sélection d'un smur
 function selectsmuriso(smurName) {
   // Récupérer les valeurs sélectionnées pour le profil et la durée
   var selectedProfile = document.querySelector('input[name="profile"]:checked').value;
@@ -324,7 +383,7 @@ function selectsmuriso(smurName) {
   // Ajoutez votre logique pour appeler l'API d'isochrone avec les valeurs sélectionnées
 }
 
-// SMUR iso
+// appel de la liste quand on clique sur le bouton
 function toggleDropdownIso() {
   document.getElementById("myDropdown").classList.toggle("show");
 }
@@ -353,7 +412,7 @@ function generateDropdownOptionsIso(data) {
 }
 
 map.on('load', () => {
-  // Ajoutez un événement "click" à chaque élément de la liste des SMUR pour gérer la sélection
+  // Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
   var smursiso = document.querySelectorAll('.dropdown-content .smuriso');
   smursiso.forEach(function(smuriso) {
     smuriso.addEventListener('click', function() {
@@ -361,7 +420,7 @@ map.on('load', () => {
     });
   });
 
-  // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso SMUR)
+  // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso smur)
   window.onclick = function(event) {
       if (!event.target.matches('.dropbtn')) {
           var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -375,9 +434,8 @@ map.on('load', () => {
       }
   }
 
-  // Bouton permettant de calculer les isochrones sur les SMUR
-  // Fonction pour charger les données des SMUR
-  function fetchSMURiso() {
+  // Fonction pour charger les données des smur
+  function fetchsmuriso() {
     fetch('./DATA/smurok.geojson')
       .then(response => response.json())
       .then(data => {
@@ -390,45 +448,9 @@ map.on('load', () => {
         console.error('Une erreur s est produite lors de la récupération des données:', error);
       });
   }
-  // Appeler la fonction pour récupérer les données de la couche "SMUR"
-  fetchSMURiso();
+  // Appeler la fonction pour récupérer les données de la couche "smur"
+  fetchsmuriso();
 });
-
-
-//Fonction permettant de cliquer sur la couche pour qu'elle apparait
-switchlayer = function (lname) {
-  if (document.getElementById(lname + "CB").checked) {
-     map.setLayoutProperty(lname, 'visibility', 'visible');
-  } else {
-     map.setLayoutProperty(lname, 'visibility', 'none');
-  }
-}
-
-
-
-// //popup SMUR
-// map.on('click', 'SMUR', function (e) {
-//   var coordinates = e.features[0].geometry.coordinates.slice();
-//   var description = e.features[0].properties.description;
-//   var nomSMUR = e.features[0].properties.name; 
-//   var telephone = e.features[0].properties.phone; 
-//   var site_web = e.features[0].properties.website;
-//   var displaySiteWeb = site_web.length > 20 ? site_web.substring(0, 20) + "..." : site_web; /* Le lien hypertexte mais raccourci*/
-  
-//   // Créez le contenu HTML pour le popup
-//   var popupContent = "<div class='popup'>";
-//   popupContent += "<h3>" + nomSMUR + "</h3>";
-//   popupContent += "<p class='info'>Téléphone : " + telephone +"</p>";
-//   popupContent += "<p class='info'>Site Web : <a href='" + site_web + "' target='_blank'>" + displaySiteWeb + "</a></p>";
-//   popupContent += "</div>";
-
-//   // Créez une popup et attachez-la à l'élément cliqué
-//   new mapboxgl.Popup()
-//     .setLngLat(coordinates)
-//     .setHTML(popupContent)
-//     .addTo(map);
-// });
-
 
 // Fonction pour créer un isochrone pour un emplacement donné
 async function createIsochrone(coordinates) {
@@ -459,14 +481,125 @@ async function getIso(lon, lat) {
 // Fonction pour mettre à jour les isochrones avec la nouvelle valeur de minutes
 async function updateIsochrone() {
   // Récupérer les coordonnées du site olympique sélectionné
-  const lon = feature.SMUR.geo_point.lon;
-  const lat = feature.SMUR.geo_point.lat;
+  const lon = feature.smur.geo_point.lon;
+  const lat = feature.smur.geo_point.lat;
   // Appeler la fonction getIso avec les nouvelles valeurs de lon, lat et minutes
   await getIso(lon, lat);
 }
 
-// Fonction pour afficher ou masquer le menu déroulant des isochrones SMUR
-function toggleDropdown() {
-  var dropdownContent = document.getElementById("myDropdown");
-  dropdownContent.classList.toggle("show");
+//isochrones pour la couverture des SMUR
+var params = document.getElementById('params');
+var urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
+var lon = -1.68;
+var lat = 48.12;
+var profile = 'driving';
+var minutes = 30;
+// var minutes = 45;
+// var minutes = 60;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// CODE POUR AJOUTER DES POP-UP SUR LES SMUR //////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// //popup smur
+// map.on('click', 'smur', function (e) {
+//   var coordinates = e.features[0].geometry.coordinates.slice();
+//   var description = e.features[0].properties.description;
+//   var nomsmur = e.features[0].properties.name; 
+//   var telephone = e.features[0].properties.phone; 
+//   var site_web = e.features[0].properties.website;
+//   var displaySiteWeb = site_web.length > 20 ? site_web.substring(0, 20) + "..." : site_web; /* Le lien hypertexte mais raccourci*/
+  
+//   // Créez le contenu HTML pour le popup
+//   var popupContent = "<div class='popup'>";
+//   popupContent += "<h3>" + nomsmur + "</h3>";
+//   popupContent += "<p class='info'>Téléphone : " + telephone +"</p>";
+//   popupContent += "<p class='info'>Site Web : <a href='" + site_web + "' target='_blank'>" + displaySiteWeb + "</a></p>";
+//   popupContent += "</div>";
+
+//   // Créez une popup et attachez-la à l'élément cliqué
+//   new mapboxgl.Popup()
+//     .setLngLat(coordinates)
+//     .setHTML(popupContent)
+//     .addTo(map);
+// });
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// CODE POUR LES ISOCHRONES SUR L'ADRESSE /////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Boite de recherche d'adresses créée par Mapbox et accessible via leur site qui permet d'avoir accès à la base d'adresse nationale
+var geocoder = new MapboxGeocoder({
+  accessToken: mapboxgl.accessToken, //chemin vers mapbox
+  mapboxgl: mapboxgl,
+  container: 'contener'
+});
+map.addControl(geocoder);
+
+function calculateIsochrone(center, minutes) {
+fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.join(',') + '?contours_minutes=' + minutes + '&polygons=true&access_token=' + mapboxgl.accessToken)
+  .then(response => response.json())
+  .then(data => {
+    // Supprimer la couche d'isochrone existante s'il y en a une
+    if (map.getSource('isochrone')) {
+      map.removeLayer('isochrone');
+      map.removeSource('isochrone');
+    }
+    // Ajouter la nouvelle couche d'isochrone
+    map.addLayer({
+      id: 'isochrone',
+      type: 'fill',
+      source: {
+        type: 'geojson',
+        data: data
+      },
+      paint: {
+        'fill-color': '#f00',
+        'fill-opacity': 0.5
+      }
+    });
+    // Effectuer le "fly to" vers les coordonnées du centre avec un zoom personnalisé
+    map.flyTo({
+      center: center,
+      zoom: 10, // Ajuster le niveau de zoom selon vos besoins
+      speed: 0.5 // Ajuster la vitesse d'animation selon vos besoins
+    });
+  });
 }
+
+// Supprimer l'isochrone lorsque l'adresse est désélectionnée
+geocoder.on('clear', function() {
+  if (map.getSource('isochrone')) {
+      map.removeLayer('isochrone');
+      map.removeSource('isochrone');
+  }
+});
+
+// Événement de changement de temps dans la menu déroulante de configuration
+document.getElementById('isochrone-time-select').addEventListener('change', function() {
+  var selectedTime = this.value;
+  var selectedAddress = geocoder.getSelectedItem();
+  if (selectedAddress) {
+      var center = selectedAddress.geometry.coordinates;
+      calculateIsochrone(center, selectedTime);
+  }
+});
+
+// Utilisation de la fonction calculateIsochrone lorsque l'adresse est sélectionnée
+geocoder.on('result', function(ev) {
+  var center = ev.result.center; // Centre de l'adresse sélectionnée
+  var selectedTime = document.getElementById('isochrone-time-select').value;
+  calculateIsochrone(center, selectedTime);
+});
+
+
+
+
+
