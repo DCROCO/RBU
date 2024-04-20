@@ -30,12 +30,20 @@
     document.getElementById("menu").style.width = "0";
   }</script>
 
+  <script>function toggleMenu() {
+    var menu = document.getElementById("menu");
+    if (menu.style.width === "280px") { // Adjust the width value as needed
+      menu.style.width = "0";
+    } else {
+      menu.style.width = "280px"; // Adjust the width value as needed
+    }
+  }</script>
 
 <body>
     <div id='map'>
     </div>
     <div id="menu" class='menu'>
-        <h3>Menu des couches</h3>
+        <h3 class="titre-menu">Menu des couches</h3>
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">
           <div id="menu-icon">
             <span></span>
@@ -45,16 +53,9 @@
         </a>
         <div id="menu-items" class="menu-items">
           <h5>__________________________________________________________</h5>
-          <h4>Couverture des SMUR</h4>
-          <div class="dropdown-container">
-              <button onclick="toggleDropdownIso()" class="dropbtn">Choix du SMUR</button>
-              <div id="myDropdown" class="dropdown-content">
-              </div>
-          </div>
             <form id='params'>
-              <h6>____________</h6>
-              <h4 class='dropdown-container'>Options pour le calcul d'isochrones</h4>
-                <h1 class='txt-m txt-light mb6'>Choisir un mode :</h1>
+              <h4>Options pour le calcul d'isochrones</h4>
+                <h1>Choisir un mode :</h1>
                 <div class='mb12 mr12 toggle-group align-center'>
                     <label class='toggle-container'>
                         <input name='profile' type='radio' value='walking'>
@@ -65,7 +66,7 @@
                         <div class='toggle toggle--active-null toggle--null'>SMUR VL</div>
                     </label>
                 </div>
-                <h1 class='txt-m txt-light mb6'>Choisir une durée:</h1>
+                <h1>Choisir une durée:</h1>
                 <div class='mb12 mr12 toggle-group align-center'>
                     <label class='toggle-container'>
                         <input name='duration' type='radio' value='30' checked>
@@ -80,15 +81,22 @@
                         <div class='toggle toggle--active-null toggle--null'>60 min</div>
                     </label>
                 </div>
+                <h6>____________</h6>
             </form>
+            <h4>Couverture des SMUR</h4>
+          <div class="dropdown-container">
+              <button onclick="toggleDropdownIso()" class="dropbtn">Choix du SMUR</button>
+              <div id="myDropdown" class="dropdown-content">
+              </div>
+          </div>
             <h5>__________________________________________________________</h5>
-            <h4 class="ListeUrgence-container">Sélection d'un SMUR</h4>
-            <div id="layerList">
+            <h4>Sélection d'un SMUR</h4>
+            <div id="layerList-container">
                 <button onclick="toggleLayerList()" class="droplist">Afficher/masquer les couches</button>
                 <div id="layerListContent" class="hidden">
-                <h4>SAU</h4>
+                <h2>SAU</h2>
                 <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">Afficher/masquer tous les SAU
-                <h4>SMUR</h4>
+                <h2>SMUR</h2>
                 <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>Afficher/masquer tous les SMUR
                 <div id="smurList"></div>
                 </div>
