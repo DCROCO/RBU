@@ -23,12 +23,12 @@
 <script src='https://api.mapbox.com/mapbox.js/plugins/mapbox-isochrone/v1.0.0/mapbox-isochrone.js'></script>
 
 <script> function openNav() {
-    document.getElementById("menu").style.width = "250px";
-  }</script>
+  document.getElementById("menu").style.width = "250px";
+}</script>
   
-  <script> function closeNav() {
-    document.getElementById("menu").style.width = "0";
-  }</script>
+<script> function closeNav() {
+  document.getElementById("menu").style.width = "0";
+}</script>
 
 
 <body>
@@ -86,11 +86,11 @@
             <div id="layerList">
                 <button onclick="toggleLayerList()" class="droplist">Afficher/masquer les couches</button>
                 <div id="layerListContent" class="hidden">
-                <h4>SAU</h4>
-                <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">Afficher/masquer tous les SAU
-                <h4>SMUR</h4>
-                <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>Afficher/masquer tous les SMUR
-                <div id="smurList"></div>
+                    <h6>SAU</h6>
+                    <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">Afficher/masquer tous les SAU
+                    <h6>SMUR</h6>
+                    <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>Afficher/masquer tous les SMUR
+                    <div id="smurButtons"></div>
                 </div>
             </div>
         </div>

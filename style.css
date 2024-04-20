@@ -81,7 +81,7 @@
   z-index: 1;
   left: 0; /* Align to the left */
   width : 250px;
-  overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
+  overflow-y: auto; 
 }
 
 /* noms des smur dans la liste déroulante */
@@ -110,7 +110,7 @@
   font-size: 20px;
   border-radius: 5px;
   border: none;
-  width : 280px;
+  width : 240px;
   text-align: center;
 }
 
@@ -122,15 +122,24 @@
 /*position de la popup menu deroulant*/
 #layerList {
   position: absolute;
-  bottom: 10px; 
-  right: 100%; 
+  top: 405px; 
+  right: 5px; /* Align to the right with 20px offset */
 }
 
 #layerListContent {
   background-color: #f9f9f9;
   max-height: 300px; /* Hauteur maximale de la liste déroulante */
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
+  text-align : left;
+  font: 11px 'Montserrat', Arial, Helvetica, sans-serif;
+  margin-left : 5px;
+}
 
+h6 {
+  color: #b57205;
+  font-weight: bold;
+  text-align : left;
+  font: 20px 'Montserrat', Arial, Helvetica, sans-serif;
 }
 
 /* Liste déroulante */
@@ -151,7 +160,6 @@
   color: black;
   padding: 10px 10px;
   text-decoration: none;
-  font: 8px 'Montserrat', Arial, Helvetica, sans-serif;
   display: block;
 }
 
