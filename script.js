@@ -109,24 +109,23 @@ map.on ('load', function() {
     map.addImage('custom-marker-4', image);
   });
 
-  // chargement des données smur
+  // chargement des données smurs
   map.addLayer({
     'id': 'smur',
     'type': 'symbol',
     'source': 'source_smur',
     'layout': {
       'icon-image': ['match', ['get', 'field_1'], 
-                     'SMUR Bretagne', 'custom-marker-1', 
-                     'SMUR Limitrophes', 'custom-marker-2',
-                     'HélicoD', 'custom-marker-3',
-                     'Hélico', 'custom-marker-4',
-                     'default-marker'],
+                    'SMUR Bretagne', 'custom-marker-1', 
+                    'SMUR Limitrophes', 'custom-marker-2',
+                    'HélicoD', 'custom-marker-3',
+                    'Hélico', 'custom-marker-4',
+                    'default-marker'],
       'icon-size': 0.8,
       'icon-allow-overlap': true,
-      'visibility': 'visible'
-    } 
+      'visibility': 'visible' // Définissez la visibilité initiale de la couche sur 'none'
+    }
   });
-
 
   //Ajout des SAMU 
   map.addSource('source_SAMU', {
@@ -249,49 +248,29 @@ map.on ('load', function() {
 });
 
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////// CODE POUR LISTER LES SMUR ///////////////////////////////////////////
+//////////////////////////////////// CODE CREATION LISTE DYNAMIQUE  ///////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 map.on('load', () => {
-  // Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
-  var smurs = document.querySelectorAll('.hidden .smur');
-  smurs.forEach(function(smur) {
-    smur.addEventListener('click', function() {
-      selectsmuriso(smur.textContent);
-    });
-  });
-
   // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso smur)
-  window.onclick = function(event) {
-      if (!event.target.matches('.droplist')) {
+  window.onclick = function(event2) {
+      if (!event2.target.matches('.droplist')) {
           var layerList = document.getElementsByClassName("hidden");
           var i;
           for (i = 0; i < layerList.length; i++) {
-              var openlayerList = dropdowns[i];
+              var openlayerList = layerList[i];
               if (openlayerList.classList.contains('show2')) {
                   openlayerList.classList.remove('show2');
               }
           }
       }
   }
-
-// Utilisez la fonction fetch() pour récupérer les données SMUR à partir de l'URL
-fetch(smurUrl)
-.then((response) => response.json())
-.then((data) => {
-  smurData = data; // Attribuer la valeur de data à smurData
-  // Trier les fonctionnalités en fonction du champ 'Ville'
-  data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
-  generatesmurOptions(data);
-  console.log("smurData:", smurData);
-})
-.catch((error) => {
-  console.error(error);
-});
-
+    // Appel de la fonction pour afficher/masquer la liste déroulante
+    toggleLayerList();
 }); 
 
 // Fonction pour basculer l'affichage de la liste déroulante
@@ -300,7 +279,27 @@ function toggleLayerList() {
   layerListContent.classList.toggle("hidden");
 }
 
-// Fonction pour basculer l'affichage d'une couche spécifique (SAMU ou sau)
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////// CODE AFFICHE TOUS LES SMUR ET SAU  /////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Afficher/masquer tous les SMUR
+const smurCheckbox = document.getElementById("smurLayer");
+smurCheckbox.addEventListener("change", function () {
+  const visible = smurCheckbox.checked;
+  toggleLayer('smur', visible);
+});
+
+// Afficher/masquer tous les sau
+const sauCheckbox = document.getElementById("sauLayer");
+sauCheckbox.addEventListener("change", function () {
+  const visible = sauCheckbox.checked;
+  toggleLayer('sau', visible);
+});
+
+// Fonction pour activer la checkbox des SAU et SMUR
 function toggleLayer(layerId, visible) {
   const layer = map.getLayer(layerId);
   if (layer) {
@@ -309,59 +308,78 @@ function toggleLayer(layerId, visible) {
   }
 }
 
-// Fonction pour générer les options du menu déroulant pour les smur
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// CODE POUR LISTER LES SMUR ///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Récupérez l'URL du fichier GeoJSON à partir de l'objet source SMUR
+const smurUrl = './DATA/smurok.geojson';
+
+// Utilisez la fonction fetch() pour récupérer les données SMUR à partir de l'URL
+document.addEventListener('DOMContentLoaded', function() {
+  fetch(smurUrl)
+  .then((response) => response.json())
+  .then((data) => {
+    smurData = data;
+    // Trier les fonctionnalités en fonction du champ 'Ville'
+    data.features.sort((a, b) => a.properties.SMUR.localeCompare(b.properties.SMUR));
+    generatesmurOptions(data);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+});
+
+// Fonction qui permet de retourner le mot en mettant la première lettre en majuscule
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+
+// Fonction pour générer les options du menu déroulant pour la liste des smur
 function generatesmurOptions(smurData) {
-  const smurList = document.getElementById("smurList");
+  const smurButtons = document.getElementById("smurButtons");
   smurData.features.forEach(feature => {
-    if (feature.properties.fid) { // Vérifiez si la propriété fid existe
+    if (feature.properties.fid != null) { // Vérifiez si la propriété fid est définie et non nulle
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.id = `smur-${feature.properties.fid}`;
-      checkbox.onchange = () => togglesmur(feature.properties.fid, checkbox.checked);
+      checkbox.onchange = () => togglesmur(`smur-${feature.properties.fid}`, checkbox.checked);
       const label = document.createElement("label");
       label.htmlFor = `smur-${feature.properties.fid}`;
-      label.textContent = feature.properties.Ville;
-      smurList.appendChild(checkbox);
-      smurList.appendChild(label);
-      smurList.appendChild(document.createElement("br"));
+      label.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase());
+      smurButtons.appendChild(checkbox);
+      smurButtons.appendChild(label);
+      smurButtons.appendChild(document.createElement("br"));
+
+      // Ajouter les marqueurs SMUR sur la carte
+      map.addLayer({
+        'id': `smur-${feature.properties.fid}`,
+        'type': 'circle',
+        'source': 'source_smur'
+      });
     }
   });
 }
 
-// //Fonction pour afficher/masquer un SMUR spécifique
-// function togglesmur(smurId, visible) {
-//   const filter = ['==', 'fid', smurId];
-//   map.setFilter('smur', visible ? filter : ['==', 'fid', '']);
-//   const feature = smurData.features.find(f => f.properties.fid === smurId);
-//   map.jumpTo({ center: feature.geometry.coordinates });
-// }
-
-// Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
-var smurs = document.querySelectorAll('.hidden .smur');
-smurs.forEach(function(smur) {
-  smur.addEventListener('click', function() {
-    selectsmur(smur.textContent);
-  });
-});
-
-// Fonction pour afficher/masquer tous les SMUR
-const smurCheckbox = document.getElementById("smurLayer");
-smurCheckbox.addEventListener("change", function () {
-  const visible = smurCheckbox.checked;
-  map.setFilter('smur', visible);
-});
-
-// Fonction pour afficher/masquer tous les sau
-const sauCheckbox = document.getElementById("sauLayer");
-sauCheckbox.addEventListener("change", function () {
-  const visible = sauCheckbox.checked;
-  toggleLayer("sau", visible);
-});
+//Fonction pour afficher/masquer un SMUR spécifique
+function togglesmur(smurId, visible) {
+  const layerId = `smur-${smurId}`;
+  if (visible) {
+    const filter = ['==', 'fid', smurId];
+    map.setFilter(layerId, filter);
+    const feature = smurData.features.find(f => f.properties.fid === smurId);
+    map.jumpTo({ center: feature.geometry.coordinates });
+  } else {
+    map.setLayoutProperty(layerId, 'visibility', 'none');
+  }
+}
 
 
-let smurData;
-// Récupérez l'URL du fichier GeoJSON à partir de l'objet source SMUR
-const smurUrl = './DATA/smurok.geojson';
+
+
 
 
 
@@ -376,11 +394,9 @@ function selectsmuriso(smurName) {
   // Récupérer les valeurs sélectionnées pour le profil et la durée
   var selectedProfile = document.querySelector('input[name="profile"]:checked').value;
   var selectedDuration = document.querySelector('input[name="duration"]:checked').value;
-  // Vous pouvez ici utiliser les valeurs sélectionnées pour déterminer l'appel à votre API d'isochrone
   console.log("Profil sélectionné :", selectedProfile);
   console.log("Durée sélectionnée :", selectedDuration);
   console.log("SMUR sélectionné :", smurName);
-  // Ajoutez votre logique pour appeler l'API d'isochrone avec les valeurs sélectionnées
 }
 
 // appel de la liste quand on clique sur le bouton
@@ -397,7 +413,7 @@ function generateDropdownOptionsIso(data) {
     // Créer une option pour chaque élément
     var option = document.createElement("a");
     option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
-    option.textContent = feature.properties.Ville; // Utiliser la valeur du champ 'nom' de chaque feature
+    option.textContent = feature.properties.SMUR; 
     option.classList.add('smuriso'); // Ajouter la classe 'smuriso' à chaque élément
     // Ajouter un gestionnaire d'événements pour le clic sur chaque option
     option.addEventListener("click", function() {
@@ -440,7 +456,7 @@ map.on('load', () => {
       .then(response => response.json())
       .then(data => {
         // Trier les fonctionnalités en fonction du champ 'Ville'
-        data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.Ville));
+        data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.SMUR));
         // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
         generateDropdownOptionsIso(data);
       })
@@ -598,8 +614,4 @@ geocoder.on('result', function(ev) {
   var selectedTime = document.getElementById('isochrone-time-select').value;
   calculateIsochrone(center, selectedTime);
 });
-
-
-
-
 
