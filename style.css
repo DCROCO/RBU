@@ -80,7 +80,7 @@
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   left: 0; /* Align to the left */
-  width : 235px;
+  width : 290px;
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
   text-align : left;
 }
@@ -130,8 +130,8 @@
 #layerListContent {
   position: absolute;
   left: 0; /* Align to the left */
-  background-color: #f9f9f9;
-  max-height: 200px; /* Hauteur maximale de la liste déroulante */
+  background-color: white;
+  max-height: 150px; /* Hauteur maximale de la liste déroulante */
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
   font-size: 12px;
   width : 220px;
@@ -141,16 +141,16 @@
 }
 
 /* Liste déroulante */
-.hidden {
+.hiddenList {
   display: none;
   position: absolute;
-  background-color: #f9f9f9;
+  background-color: white;
   max-height: 120px; /* Hauteur maximale de la liste déroulante */
-  width : 280px;
+  width : 290px;
 }
 
 /* noms des smur dans la liste déroulante */
-.hidden a {
+.hiddenList a {
   padding: 10px 10px;
   text-decoration: none;
   font: 9px 'Montserrat', Arial, Helvetica, sans-serif;
@@ -158,14 +158,13 @@
 }
 
 /* Change color of dropdown links on hover */
-.hidden a:hover {
+.hiddenList a:hover {
   background-color: #f2a11f;
 }
 
-#selectedSmurCount{
-  font: 11px 'Montserrat', Arial, Helvetica, sans-serif;
-  padding: 10px 10px;
-
+/* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
+.show2 {
+  display:block;
 }
 
 .config-panel{
@@ -184,11 +183,6 @@
 #isochrone-time-select{
   color:#6b6b6b;
   border-color: white;
-}
-
-/* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
-.show2 {
-  display:block;
 }
 
 /*Définition de la fenetre du menu*/
@@ -266,6 +260,7 @@
 /*Gestion des titres des élements du menu*/
 .menu-items h1 {
   font-size: 12px;
+  font-weight: bold;
 }
 .menu-items h2 {
   font-size: 12px;
@@ -280,5 +275,18 @@
 .menu-items h6 {
   color: #f2a221;
   position: center;
-  padding-top: -20px;
+  margin-top: -8px;
+}
+
+/*Définition du style des boutons standards pour les options de calcul du SMUR*/
+.toggle {
+  background-color: none ; 
+  text-align: center;
+  cursor: pointer;
+  padding: 5px;
+}
+/* Style des boutons quand ils sont sélectionnés*/
+input[type="radio"]:checked + .toggle {
+  background-color: #f2a221; 
+  padding-bottom: -10px
 }

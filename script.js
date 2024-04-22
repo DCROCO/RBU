@@ -76,12 +76,13 @@ map.on ('load', function() {
     'paint': {'line-color': [
 	    'match',['get', 'class'],
       'motorway', '#E990A0',
-      'primary', '#FDD7A1',
-      'secondary', '#FDD7A1',
-      'tertiary', '#FEFEFE',
-      'trunk', '#FBC0AC',
-      '#A5A9B0'], 
-    'line-width' : 1.5,
+      'primary', '#E990A0',
+      'secondary', '#F7B4C0',
+      'tertiary', '#F7B4C0',
+      'trunk', '#E990A0',
+      '#F7B4C0'], 
+    'line-width' : 1,
+    'line-opacity': 0.5
     }
   });
 
@@ -259,7 +260,7 @@ map.on('load', () => {
   // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso smur)
   window.onclick = function(event2) {
       if (!event2.target.matches('.droplist')) {
-          var layerList = document.getElementsByClassName("hidden");
+          var layerList = document.getElementsByClassName("hiddenList");
           var i;
           for (i = 0; i < layerList.length; i++) {
               var openlayerList = layerList[i];
@@ -276,7 +277,7 @@ map.on('load', () => {
 // Fonction pour basculer l'affichage de la liste déroulante
 function toggleLayerList() {
   const layerListContent = document.getElementById("layerListContent");
-  layerListContent.classList.toggle("hidden");
+  layerListContent.classList.toggle("hiddenList");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +311,7 @@ function toggleLayer(layerId, visible) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////// CODE POUR LISTER LES SMUR ///////////////////////////////////////////
+////////////////////////:///// CODE POUR LISTER LES VEHICULES SMUR ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -325,21 +326,19 @@ document.addEventListener('DOMContentLoaded', function() {
     smurData = data;
     // Trier les fonctionnalités en fonction du champ 'Ville'
     data.features.sort((a, b) => a.properties.SMUR.localeCompare(b.properties.SMUR));
-    generatesmurOptions(smurData);
+    generatevehismurOptions(smurData);
+    generatehelismurOptions(smurData);
   })
   .catch((error) => {
     console.error(error);
   });
 });
 
-
-
-
-// Fonction pour générer les options du menu déroulant pour la liste des SMUR
-function generatesmurOptions(data) {
-  const smurListe = document.getElementById("smurList");
+// Fonction pour générer les options du menu déroulant pour la liste des véhicules SMUR
+function generatevehismurOptions(data) {
+  const smurListe = document.getElementById("vehismurList");
   data.features.forEach(feature => {
-    if (feature.properties.fid != null) { // Vérifiez si la propriété fid est définie et non nulle
+    if (feature.properties.fid != null && feature.properties.field_1 === 'SMUR Bretagne') { 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.id = `smur-${feature.properties.fid}`;
@@ -353,6 +352,26 @@ function generatesmurOptions(data) {
     }
   });
 }
+
+// Fonction pour générer les options du menu déroulant pour la liste des héliSMUR
+function generatehelismurOptions(data) {
+  const smurListe = document.getElementById("helismurList");
+  data.features.forEach(feature => {
+    if (feature.properties.fid != null && (feature.properties.field_1 === 'Hélico' || feature.properties.field_1 === 'HélicoD')) { 
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = `smur-${feature.properties.fid}`;
+      checkbox.onchange = () => togglesmur(`smur-${feature.properties.fid}`, checkbox.checked);
+      const label = document.createElement("label");
+      label.htmlFor = `smur-${feature.properties.fid}`;
+      label.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase());
+      smurListe.appendChild(checkbox);
+      smurListe.appendChild(label);
+      smurListe.appendChild(document.createElement("br"));
+    }
+  });
+}
+
 
 // Tableau pour stocker les identifiants des couches SMUR sélectionnées
 let selectedSmurLayers = [];
@@ -433,134 +452,177 @@ function togglesmur(smurId, visible) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////// CODE POUR CALCULER LES COUVERTURES DU SMUR /////////////////////////////
+////////////////////////////// CODE POUR CALCULER LA COUVERTURE DES SMUR //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Fonction pour gérer la sélection d'un smur
-function selectsmuriso(smurName) {
-  // Récupérer les valeurs sélectionnées pour le profil et la durée
-  var selectedProfile = document.querySelector('input[name="profile"]:checked').value;
-  var selectedDuration = document.querySelector('input[name="duration"]:checked').value;
-  console.log("Profil sélectionné :", selectedProfile);
-  console.log("Durée sélectionnée :", selectedDuration);
-  console.log("SMUR sélectionné :", smurName);
+
+// Récupérer les éléments de la page
+const helismurRadio = document.getElementById('helismur');
+const smurvlRadio = document.getElementById('smurvl');
+const dropdownContent = document.getElementById('myDropdown');
+
+// Ajouter un gestionnaire d'événements pour les boutons de radio
+helismurRadio.addEventListener('change', updateDropdown);
+smurvlRadio.addEventListener('change', updateDropdown);
+
+// Fonction pour mettre à jour la liste déroulante en fonction du mode de déplacement sélectionné
+function updateDropdown() {
+  // Effacer le contenu de la liste déroulante
+  dropdownContent.innerHTML = '';
+
+  // Sélectionner les SMUR en fonction du mode de déplacement
+  const selectedMode = helismurRadio.checked ? 'Hélico' : 'SMUR Bretagne';
+
+  // Mettre à jour la liste déroulante en fonction du mode sélectionné
+  const smurList = smurData.features.filter(feature => feature.properties.field_1 === selectedMode);
+  smurList.forEach(feature => {
+    const option = document.createElement('a');
+    option.textContent = feature.properties.SMUR;
+    option.addEventListener('click', () => selectSmur(feature.properties.SMUR));
+    dropdownContent.appendChild(option);
+  });
 }
+
+// Fonction appelée lorsque l'utilisateur sélectionne un SMUR dans la liste déroulante
+function selectSmur(smurName) {
+  // Mettre en œuvre les actions souhaitées lorsque l'utilisateur sélectionne un SMUR
+  console.log('SMUR sélectionné :', smurName);
+}
+
+// Appeler la fonction pour initialiser la liste déroulante avec le mode de déplacement par défaut
+updateDropdown();
+
+
 
 // appel de la liste quand on clique sur le bouton
 function toggleDropdownIso() {
   document.getElementById("myDropdown").classList.toggle("show");
 }
 
-// Fonction pour générer les options du menu déroulant à partir des données
-function generateDropdownOptionsIso(data) {
-  // Récupérer le conteneur du menu déroulant
-  var dropdownContent = document.getElementById("myDropdown");
-  // Parcourir les données
-  data.features.forEach(feature => {
-    // Créer une option pour chaque élément
-    var option = document.createElement("a");
-    option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
-    option.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase()); 
-    option.classList.add('smuriso'); // Ajouter la classe 'smuriso' à chaque élément
-    // Ajouter un gestionnaire d'événements pour le clic sur chaque option
-    option.addEventListener("click", function() {
-      // Récupérer les coordonnées de la fonctionnalité
-      var coordinates = feature.geometry.coordinates;
-      // Appeler la fonction pour créer un isochrone pour cet emplacement
-      createIsochrone(coordinates);
-    });
-    // Ajouter l'option au menu déroulant
-    dropdownContent.appendChild(option);
-  });
-}
+// // Fonction pour générer les options du menu déroulant à partir des données
+// function generateDropdownOptionsIso(data) {
+//   // Récupérer le conteneur du menu déroulant
+//   var dropdownContent = document.getElementById("myDropdown");
+//   // Parcourir les données
+//   data.features.forEach(feature => {
+//     // Créer une option pour chaque élément
+//     var option = document.createElement("a");
+//     option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
+//     option.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase()); 
+//     option.classList.add('smuriso'); // Ajouter la classe 'smuriso' à chaque élément
+//     // Ajouter un gestionnaire d'événements pour le clic sur chaque option
+//     option.addEventListener("click", function() {
+//       // Récupérer les coordonnées de la fonctionnalité
+//       var coordinates = feature.geometry.coordinates;
+//       // Appeler la fonction pour créer un isochrone pour cet emplacement
+//       createIsochrone(coordinates);
+//     });
+//     // Ajouter l'option au menu déroulant
+//     dropdownContent.appendChild(option);
+//   });
+// }
 
-map.on('load', () => {
-  // Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
-  var smursiso = document.querySelectorAll('.dropdown-content .smuriso');
-  smursiso.forEach(function(smuriso) {
-    smuriso.addEventListener('click', function() {
-      selectsmuriso(smuriso.textContent);
-    });
-  });
+// map.on('load', () => {
+//   // Ajoutez un événement "click" à chaque élément de la liste des smur pour gérer la sélection
+//   var smursiso = document.querySelectorAll('.dropdown-content .smuriso');
+//   smursiso.forEach(function(smuriso) {
+//     smuriso.addEventListener('click', function() {
+//       selectsmuriso(smuriso.textContent);
+//     });
+//   });
 
-  // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso smur)
-  window.onclick = function(event) {
-      if (!event.target.matches('.dropbtn')) {
-          var dropdowns = document.getElementsByClassName("dropdown-content");
-          var i;
-          for (i = 0; i < dropdowns.length; i++) {
-              var openDropdown = dropdowns[i];
-              if (openDropdown.classList.contains('show')) {
-                  openDropdown.classList.remove('show');
-              }
-          }
-      }
-  }
+//   // Fermer le bouton déroulant si l'utilisateur clique en dehors de celui-ci (iso smur)
+//   window.onclick = function(event) {
+//       if (!event.target.matches('.dropbtn')) {
+//           var dropdowns = document.getElementsByClassName("dropdown-content");
+//           var i;
+//           for (i = 0; i < dropdowns.length; i++) {
+//               var openDropdown = dropdowns[i];
+//               if (openDropdown.classList.contains('show')) {
+//                   openDropdown.classList.remove('show');
+//               }
+//           }
+//       }
+//   }
 
-  // Fonction pour charger les données des smur
-  function fetchsmuriso() {
-    fetch('./DATA/smurok.geojson')
-      .then(response => response.json())
-      .then(data => {
-        // Trier les fonctionnalités en fonction du champ 'Ville'
-        data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.SMUR));
-        // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
-        generateDropdownOptionsIso(data);
-      })
-      .catch(error => {
-        console.error('Une erreur s est produite lors de la récupération des données:', error);
-      });
-  }
-  // Appeler la fonction pour récupérer les données de la couche "smur"
-  fetchsmuriso();
-});
+//   // Fonction pour charger les données des smur
+//   function fetchsmuriso() {
+//     fetch('./DATA/smurok.geojson')
+//       .then(response => response.json())
+//       .then(data => {
+//         // Trier les fonctionnalités en fonction du champ 'Ville'
+//         data.features.sort((a, b) => a.properties.Ville.localeCompare(b.properties.SMUR));
+//         // Une fois les données récupérées avec succès, appeler la fonction pour générer les options du menu déroulant
+//         generateDropdownOptionsIso(data);
+//       })
+//       .catch(error => {
+//         console.error('Une erreur s est produite lors de la récupération des données:', error);
+//       });
+//   }
+//   // Appeler la fonction pour récupérer les données de la couche "smur"
+//   fetchsmuriso();
+// });
 
-// Fonction pour créer un isochrone pour un emplacement donné
-async function createIsochrone(coordinates) {
-  const lon = coordinates[0];
-  const lat = coordinates[1];
-  // Appeler la fonction getIso avec les coordonnées fournies
-  await getIso(lon, lat);
+// // Fonction pour créer un isochrone pour un emplacement donné
+// async function createIsochrone(coordinates) {
+//   const lon = coordinates[0];
+//   const lat = coordinates[1];
+//   // Appeler la fonction getIso avec les coordonnées fournies
+//   await getIso(lon, lat);
        
-  // Effectuer le "fly to" vers les coordonnées sélectionnées
-  map.flyTo({
-    center: coordinates,
-    zoom: 9, // Vous pouvez ajuster le niveau de zoom selon vos besoins
-    speed: 0.8 // Vous pouvez ajuster la vitesse d'animation selon vos besoins
-  }); 
+//   // Effectuer le "fly to" vers les coordonnées sélectionnées
+//   map.flyTo({
+//     center: coordinates,
+//     zoom: 9, // Vous pouvez ajuster le niveau de zoom selon vos besoins
+//     speed: 0.8 // Vous pouvez ajuster la vitesse d'animation selon vos besoins
+//   }); 
+// }
+
+// // Modifier la fonction getIso pour accepter les coordonnées comme arguments
+// async function getIso(lon, lat) {
+//   const query = await fetch(
+//     `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
+//     { method: 'GET' }
+//   );
+//   const data = await query.json();
+//   // Set the 'iso' source's data to what's returned by the API query
+//   map.getSource('iso').setData(data);
+// }
+
+// // Fonction pour mettre à jour les isochrones avec la nouvelle valeur de minutes
+// async function updateIsochrone() {
+//   // Récupérer les coordonnées du site olympique sélectionné
+//   const lon = feature.smur.geo_point.lon;
+//   const lat = feature.smur.geo_point.lat;
+//   // Appeler la fonction getIso avec les nouvelles valeurs de lon, lat et minutes
+//   await getIso(lon, lat);
+// }
+
+// //isochrones pour la couverture des SMUR
+// var params = document.getElementById('params');
+// var urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
+// var lon = -1.68;
+// var lat = 48.12;
+// var profile = 'driving';
+// var minutes = 30;
+// // var minutes = 45;
+// // var minutes = 60;
+
+//Création de la fonction pour supprimé l'isochrone après son calcul
+function removeIsochrone() {
+  if (map.getSource('iso')) {
+    map.getSource('iso').setData({
+      "type": "FeatureCollection",
+      "features": []
+    });
+  }
 }
 
-// Modifier la fonction getIso pour accepter les coordonnées comme arguments
-async function getIso(lon, lat) {
-  const query = await fetch(
-    `${urlBase}${profile}/${lon},${lat}?contours_minutes=${minutes}&polygons=true&access_token=${mapboxgl.accessToken}`,
-    { method: 'GET' }
-  );
-  const data = await query.json();
-  // Set the 'iso' source's data to what's returned by the API query
-  map.getSource('iso').setData(data);
-}
-
-// Fonction pour mettre à jour les isochrones avec la nouvelle valeur de minutes
-async function updateIsochrone() {
-  // Récupérer les coordonnées du site olympique sélectionné
-  const lon = feature.smur.geo_point.lon;
-  const lat = feature.smur.geo_point.lat;
-  // Appeler la fonction getIso avec les nouvelles valeurs de lon, lat et minutes
-  await getIso(lon, lat);
-}
-
-//isochrones pour la couverture des SMUR
-var params = document.getElementById('params');
-var urlBase = 'https://api.mapbox.com/isochrone/v1/mapbox/';
-var lon = -1.68;
-var lat = 48.12;
-var profile = 'driving';
-var minutes = 30;
-// var minutes = 45;
-// var minutes = 60;
-
+//Suppression par un click de l'isochrone
+map.on('click', function(e) {
+  removeIsochrone();
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -603,7 +665,10 @@ var minutes = 30;
 var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken, //chemin vers mapbox
   mapboxgl: mapboxgl,
-  container: 'contener'
+  container: 'contener',
+  marker: {
+    color: '#c65505'
+    }
 });
 map.addControl(geocoder);
 
@@ -625,8 +690,8 @@ fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.joi
         data: data
       },
       paint: {
-        'fill-color': '#f00',
-        'fill-opacity': 0.5
+        'fill-color': '#FB4D3D',
+        'fill-opacity': 0.6
       }
     });
     // Effectuer le "fly to" vers les coordonnées du centre avec un zoom personnalisé
