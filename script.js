@@ -76,12 +76,13 @@ map.on ('load', function() {
     'paint': {'line-color': [
 	    'match',['get', 'class'],
       'motorway', '#E990A0',
-      'primary', '#FDD7A1',
-      'secondary', '#FDD7A1',
-      'tertiary', '#FEFEFE',
-      'trunk', '#FBC0AC',
-      '#A5A9B0'], 
-    'line-width' : 1.5,
+      'primary', '#E990A0',
+      'secondary', '#F7B4C0',
+      'tertiary', '#F7B4C0',
+      'trunk', '#E990A0',
+      '#F7B4C0'], 
+    'line-width' : 1,
+    'line-opacity': 0.5
     }
   });
 
@@ -561,6 +562,20 @@ var minutes = 30;
 // var minutes = 45;
 // var minutes = 60;
 
+//Création de la fonction pour supprimé l'isochrone après son calcul
+function removeIsochrone() {
+  if (map.getSource('iso')) {
+    map.getSource('iso').setData({
+      "type": "FeatureCollection",
+      "features": []
+    });
+  }
+}
+
+//Suppression par un click de l'isochrone
+map.on('click', function(e) {
+  removeIsochrone();
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
