@@ -282,3 +282,13 @@
   position: center;
   padding-top: -20px;
 }
+/*Définition du style des boutons standards pour les options de calcul du SMUR*/
+.toggle {
+  background-color: none ; 
+  text-align: center;
+  cursor: pointer;
+}
+/* Style des boutons quand ils sont sélectionnés*/
+input[type="radio"]:checked + .toggle {
+  background-color: #f2a221; 
+}

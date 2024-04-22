@@ -222,8 +222,8 @@ map.on ('load', function() {
     'source': 'iso',
     'layout': {},
     'paint': {
-      'line-color': '#000000',
-      'line-width': 0
+      'line-color': '#f2a221',
+      'line-width': 0.6
     }
   },
   'poi-label'
@@ -236,8 +236,8 @@ map.on ('load', function() {
     'source': 'iso',
     'layout': {},
     'paint': {
-      'fill-color': '#f00',
-      'fill-opacity': 0.5
+      'fill-color': '#f2a221',
+      'fill-opacity': 0.6
     }
   },
   'poi-label'
@@ -625,8 +625,8 @@ fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.joi
         data: data
       },
       paint: {
-        'fill-color': '#f00',
-        'fill-opacity': 0.5
+        'fill-color': '#FB4D3D',
+        'fill-opacity': 0.6
       }
     });
     // Effectuer le "fly to" vers les coordonnées du centre avec un zoom personnalisé
