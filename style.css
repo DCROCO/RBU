@@ -141,7 +141,7 @@
 }
 
 /* Liste déroulante */
-.hidden {
+.hiddenList {
   display: none;
   position: absolute;
   background-color: white;
@@ -150,7 +150,7 @@
 }
 
 /* noms des smur dans la liste déroulante */
-.hidden a {
+.hiddenList a {
   padding: 10px 10px;
   text-decoration: none;
   font: 9px 'Montserrat', Arial, Helvetica, sans-serif;
@@ -158,14 +158,13 @@
 }
 
 /* Change color of dropdown links on hover */
-.hidden a:hover {
+.hiddenList a:hover {
   background-color: #f2a11f;
 }
 
-#selectedSmurCount{
-  font: 11px 'Montserrat', Arial, Helvetica, sans-serif;
-  padding: 10px 10px;
-
+/* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
+.show2 {
+  display:block;
 }
 
 .config-panel{
@@ -184,11 +183,6 @@
 #isochrone-time-select{
   color:#6b6b6b;
   border-color: white;
-}
-
-/* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
-.show2 {
-  display:block;
 }
 
 /*Définition de la fenetre du menu*/
