@@ -80,8 +80,9 @@
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
   left: 0; /* Align to the left */
-  width : 280px;
+  width : 235px;
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
+  text-align : left;
 }
 
 /* noms des smur dans la liste déroulante */
@@ -90,7 +91,8 @@
   text-decoration: none;
   display: block;
   font-size: 12px;
-  text-align: center; 
+  margin-left : 15px;
+  margin-right : 15px;
 }
 
 /* Change color of dropdown links on hover */
@@ -129,10 +131,13 @@
   position: absolute;
   left: 0; /* Align to the left */
   background-color: #f9f9f9;
-  max-height: 160px; /* Hauteur maximale de la liste déroulante */
+  max-height: 200px; /* Hauteur maximale de la liste déroulante */
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
   font-size: 12px;
-  width : 280px;
+  width : 220px;
+  text-align : left;
+  margin-left : 15px;
+  margin-right : 15px;
 }
 
 /* Liste déroulante */
@@ -155,6 +160,12 @@
 /* Change color of dropdown links on hover */
 .hidden a:hover {
   background-color: #f2a11f;
+}
+
+#selectedSmurCount{
+  font: 11px 'Montserrat', Arial, Helvetica, sans-serif;
+  padding: 10px 10px;
+
 }
 
 .config-panel{

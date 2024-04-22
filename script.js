@@ -325,23 +325,20 @@ document.addEventListener('DOMContentLoaded', function() {
     smurData = data;
     // Trier les fonctionnalités en fonction du champ 'Ville'
     data.features.sort((a, b) => a.properties.SMUR.localeCompare(b.properties.SMUR));
-    generatesmurOptions(data);
+    generatesmurOptions(smurData);
   })
   .catch((error) => {
     console.error(error);
   });
 });
 
-// Fonction qui permet de retourner le mot en mettant la première lettre en majuscule
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 
-// Fonction pour générer les options du menu déroulant pour la liste des smur
-function generatesmurOptions(smurData) {
-  const smurButtons = document.getElementById("smurButtons");
-  smurData.features.forEach(feature => {
+
+// Fonction pour générer les options du menu déroulant pour la liste des SMUR
+function generatesmurOptions(data) {
+  const smurListe = document.getElementById("smurList");
+  data.features.forEach(feature => {
     if (feature.properties.fid != null) { // Vérifiez si la propriété fid est définie et non nulle
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -350,32 +347,83 @@ function generatesmurOptions(smurData) {
       const label = document.createElement("label");
       label.htmlFor = `smur-${feature.properties.fid}`;
       label.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase());
-      smurButtons.appendChild(checkbox);
-      smurButtons.appendChild(label);
-      smurButtons.appendChild(document.createElement("br"));
-
-      // Ajouter les marqueurs SMUR sur la carte
-      map.addLayer({
-        'id': `smur-${feature.properties.fid}`,
-        'type': 'circle',
-        'source': 'source_smur'
-      });
+      smurListe.appendChild(checkbox);
+      smurListe.appendChild(label);
+      smurListe.appendChild(document.createElement("br"));
     }
   });
 }
 
-//Fonction pour afficher/masquer un SMUR spécifique
+// Tableau pour stocker les identifiants des couches SMUR sélectionnées
+let selectedSmurLayers = [];
+
+// Fonction pour afficher/masquer un SMUR spécifique
 function togglesmur(smurId, visible) {
-  const layerId = `smur-${smurId}`;
-  if (visible) {
-    const filter = ['==', 'fid', smurId];
-    map.setFilter(layerId, filter);
-    const feature = smurData.features.find(f => f.properties.fid === smurId);
-    map.jumpTo({ center: feature.geometry.coordinates });
+  const fid = parseInt(smurId.split('-')[1]);
+  const feature = smurData.features.find(f => f.properties.fid === fid);
+  
+  if (visible && feature) {
+    const filter = ['==', 'fid', fid];
+
+    // Ajouter la couche SMUR spécifique à la liste des couches sélectionnées
+    if (!selectedSmurLayers.includes(smurId)) {
+      selectedSmurLayers.push(smurId);
+    }
+
+    map.setFilter(smurId, filter);
+    
+    // Vérifier la valeur de field_1 pour définir le style de l'icône
+    let iconImage = 'default-marker';
+    switch (feature.properties.field_1) {
+      case 'SMUR Bretagne':
+        iconImage = 'custom-marker-1';
+        break;
+      case 'SMUR Limitrophes':
+        iconImage = 'custom-marker-2';
+        break;
+      case 'HélicoD':
+        iconImage = 'custom-marker-3';
+        break;
+      case 'Hélico':
+        iconImage = 'custom-marker-4';
+        break;
+      default:
+        iconImage = 'default-marker';
+        break;
+    }
+    
+    // Ajouter la couche SMUR spécifique si elle n'est pas déjà ajoutée
+    if (!map.getLayer(smurId)) {
+      map.addLayer({
+        'id': smurId,
+        'type': 'symbol',
+        'source': 'source_smur',
+        'layout': {
+          'icon-image': iconImage,
+          'icon-size': 0.8,
+          'icon-allow-overlap': true,
+          'visibility': 'visible' // Définissez la visibilité initiale de la couche sur 'none'
+        },
+        'filter': filter
+      });
+    } else {
+      // Si la couche existe déjà, assurez-vous qu'elle est visible
+      map.setLayoutProperty(smurId, 'visibility', 'visible');
+    }
   } else {
-    map.setLayoutProperty(layerId, 'visibility', 'none');
+    // Retirer la couche SMUR spécifique de la liste des couches sélectionnées
+    const index = selectedSmurLayers.indexOf(smurId);
+    if (index !== -1) {
+      selectedSmurLayers.splice(index, 1);
+    }
+    
+    map.setLayoutProperty(smurId, 'visibility', 'none');
   }
 }
+
+
+
+
 
 
 
@@ -413,7 +461,7 @@ function generateDropdownOptionsIso(data) {
     // Créer une option pour chaque élément
     var option = document.createElement("a");
     option.href = "#"; // Vous pouvez configurer l'URL appropriée ici si nécessaire
-    option.textContent = feature.properties.SMUR; 
+    option.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase()); 
     option.classList.add('smuriso'); // Ajouter la classe 'smuriso' à chaque élément
     // Ajouter un gestionnaire d'événements pour le clic sur chaque option
     option.addEventListener("click", function() {
@@ -615,3 +663,7 @@ geocoder.on('result', function(ev) {
   calculateIsochrone(center, selectedTime);
 });
 
+// Fonction qui permet de retourner le mot en mettant la première lettre en majuscule
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
