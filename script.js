@@ -618,7 +618,10 @@ map.on('click', function(e) {
 var geocoder = new MapboxGeocoder({
   accessToken: mapboxgl.accessToken, //chemin vers mapbox
   mapboxgl: mapboxgl,
-  container: 'contener'
+  container: 'contener',
+  marker: {
+    color: '#c65505'
+    }
 });
 map.addControl(geocoder);
 
