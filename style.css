@@ -14,16 +14,31 @@
 /* Style de base pour la popup */
 .popup {
   position: absolute;
-  background-color: red;
+  background-color: #f2a11f;
   border-radius: 10px;
   padding: 10px;
-  font-family: 'Oswald', Helvetica, sans-serif;
-  width: 200px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin : 10px;
+  width: 150px;
+  box-shadow: 0 0 10px rgba(105, 105, 105, 0.5); /* Ombre */
   z-index: 1;
-  top: -35%; /* Position verticale à 50% */
-  left: 50%; /* Position horizontale à 50% */
+  top: -100%; /* Position verticale à 50% */
+  left: 0%; /* Position horizontale à 50% */
   transform: translate(-50%, -50%); /* Centrage */
+  opacity : 0.9;
+}
+
+.popup h3{
+  font: 13px 'Montserrat', Arial, Helvetica, sans-serif;
+  text-align : center;
+  font-weight : bold;
+  color : rgb(255, 255, 255);
+  margin : 5px;
+}
+
+.popup p{
+  font: 10px 'Montserrat', Arial, Helvetica, sans-serif;
+  margin : 5px;
+  color : white;
 }
 
 /* Pointe de la popup */
@@ -34,13 +49,13 @@
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 10px solid red; /* Utilisez border-top au lieu de border-bottom */
+  border-top: 10px solid #f2a11f; /* Utilisez border-top au lieu de border-bottom */
   top: calc(100% - 0px); /* Ajustez la position verticale pour qu'elle soit juste au-dessus de la popup */
   left: 50%; /* assurez-vous que c'est centré horizontalement */
   transform: translateX(-50%);
   z-index: -1; /* attribuez un z-index inférieur à la popup */
+  opacity : 0.9;
 }
-
 
 /* style liste deroulante */
 .dropbtn {

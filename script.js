@@ -39,24 +39,46 @@ map.on ('load', function() {
     'type': 'line',
     'source': 'Contours',
     'paint': {
-      'line-color': 'black',
-      'line-width': 0.3
+      'line-color': '#292929',
+      'line-width': 0.6
     }
   });
 
   //Ajout des territoires de Santé 
-  map.addSource('TerritoiresSA', {
+  map.addSource('source_TS', {
     'type': 'geojson',
-    'data': './DATA/territoire_santeok.geojson'
+    'data': './DATA/territoire_sante.geojson'
   });
 
   map.addLayer({
     'id': 'TerritoiresSA',
     'type': 'line',
-    'source': 'TerritoiresSA', 
+    'source': 'source_TS', 
     'paint' : {
-      'line-color': 'grey',
-      'line-width' : 0.1
+      'line-color': '#7CB254',
+      'line-width' : 0.2
+    },
+    'layout': {
+      'visibility': 'none'
+    }
+  });
+
+  //Ajout des départements
+  map.addSource('source_dep', {
+    'type': 'geojson',
+    'data': './DATA/departement.geojson'
+  });
+
+  map.addLayer({
+    'id': 'dep',
+    'type': 'line',
+    'source': 'source_dep', 
+    'paint' : {
+      'line-color': '#E0A419',
+      'line-width' : 0.4
+    },
+    'layout': {
+      'visibility': 'none'
     }
   });
 
@@ -105,7 +127,7 @@ map.on ('load', function() {
     if (error) throw error;
     map.addImage('custom-marker-3', image);
   });
-  map.loadImage('./DATA/HélicoD.png', function(error, image) {
+  map.loadImage('./DATA/Hélismur.png', function(error, image) {
     if (error) throw error;
     map.addImage('custom-marker-4', image);
   });
@@ -119,12 +141,12 @@ map.on ('load', function() {
       'icon-image': ['match', ['get', 'field_1'], 
                     'SMUR Bretagne', 'custom-marker-1', 
                     'SMUR Limitrophes', 'custom-marker-2',
-                    'HélicoD', 'custom-marker-3',
-                    'Hélico', 'custom-marker-4',
+                    'HéliSMUR', 'custom-marker-3',
+                    'Dragon', 'custom-marker-4',
                     'default-marker'],
       'icon-size': 0.8,
       'icon-allow-overlap': true,
-      'visibility': 'visible' // Définissez la visibilité initiale de la couche sur 'none'
+      'visibility': 'visible'
     }
   });
 
@@ -208,7 +230,7 @@ map.on ('load', function() {
     }
   });
 
-  //Ajout des iscohrones 30min autour des SMUR
+  //Ajout des iscohrones 30min autour des SMUR terrestres
   map.addSource('source_iso30', {
     'type': 'geojson',
     'data': './DATA/isochrones_SMUR_30min.geojson'
@@ -222,9 +244,28 @@ map.on ('load', function() {
       'fill-color': 'blue'
     },
     'layout': {
-      'visibility': none
+      'visibility': 'none'
     }
   });
+
+  //Ajout des iscohrones 30min autour des héliSMUR
+  map.addSource('source_heliiso30', {
+    'type': 'geojson',
+    'data': './DATA/isochrones_heliSMUR_30min.geojson'
+  });
+
+  map.addLayer({
+    'id': 'heliiso30',
+    'type': 'fill',
+    'source': 'source_heliiso30', 
+    'paint' : {
+      'fill-color': 'green'
+    },
+    'layout': {
+      'visibility': 'none'
+    }
+  });
+
 
   // Ajout isochrone pour le menu deroulant 
   map.addSource('iso', {
@@ -300,7 +341,7 @@ function toggleLayerList() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////// CODE AFFICHE TOUS LES SMUR ET SAU  /////////////////////////////////
+/////////////////////////////////// CODE AFFICHE TOUTES LES COUCHES  //////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -318,7 +359,21 @@ sauCheckbox.addEventListener("change", function () {
   toggleLayer('sau', visible);
 });
 
-// Fonction pour activer la checkbox des SAU et SMUR
+// Afficher/masquer les territoires de santé
+const TSCheckbox = document.getElementById("tsLayer");
+TSCheckbox.addEventListener("change", function () {
+  const visible = TSCheckbox.checked;
+  toggleLayer('TerritoiresSA', visible);
+});
+
+// Afficher/masquer les départements
+const DepCheckbox = document.getElementById("depLayer");
+DepCheckbox.addEventListener("change", function () {
+  const visible = DepCheckbox.checked;
+  toggleLayer('dep', visible);
+});
+
+// Fonction pour activer la checkbox des couches
 function toggleLayer(layerId, visible) {
   const layer = map.getLayer(layerId);
   if (layer) {
@@ -329,7 +384,7 @@ function toggleLayer(layerId, visible) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////:///// CODE POUR LISTER LES VEHICULES SMUR ////////////////////////////////////
+////////////////////////:///// CODE POUR LISTER TOUS LES SMUR ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -342,7 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
   .then((response) => response.json())
   .then((data) => {
     smurData = data;
-    // Trier les fonctionnalités en fonction du champ 'Ville'
+    // Trier les fonctionnalités en fonction du champ 'SMUR'
     data.features.sort((a, b) => a.properties.SMUR.localeCompare(b.properties.SMUR));
     generatevehismurOptions(smurData);
     generatehelismurOptions(smurData);
@@ -375,7 +430,7 @@ function generatevehismurOptions(data) {
 function generatehelismurOptions(data) {
   const smurListe = document.getElementById("helismurList");
   data.features.forEach(feature => {
-    if (feature.properties.fid != null && (feature.properties.field_1 === 'Hélico' || feature.properties.field_1 === 'HélicoD')) { 
+    if (feature.properties.fid != null && (feature.properties.field_1 === 'Dragon' || feature.properties.field_1 === 'HéliSMUR')) { 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.id = `smur-${feature.properties.fid}`;
@@ -390,12 +445,14 @@ function generatehelismurOptions(data) {
   });
 }
 
-
 // Tableau pour stocker les identifiants des couches SMUR sélectionnées
 let selectedSmurLayers = [];
 
-// Tableau pour stocker les identifiants des couches d'isochrones associées à chaque SMUR
+// Tableau pour stocker les identifiants des couches d'isochrones associées à chaque SMUR terrestres
 let selectedIsochroneLayers = {};
+
+// Tableau pour stocker les identifiants des couches d'isochrones associées à chaque SMUR terrestres
+let selectedIsochroneHeliLayers = {};
 
 // Fonction pour afficher/masquer un SMUR spécifique
 function togglesmur(smurId, visible) {
@@ -414,10 +471,10 @@ function togglesmur(smurId, visible) {
       case 'SMUR Limitrophes':
         iconImage = 'custom-marker-2';
         break;
-      case 'HélicoD':
+      case 'HéliSMUR':
         iconImage = 'custom-marker-3';
         break;
-      case 'Hélico':
+      case 'Dragon':
         iconImage = 'custom-marker-4';
         break;
       default:
@@ -435,7 +492,7 @@ function togglesmur(smurId, visible) {
           'icon-image': iconImage,
           'icon-size': 0.8,
           'icon-allow-overlap': true,
-          'visibility': 'visible' // Définissez la visibilité initiale de la couche sur 'none'
+          'visibility': 'visible' 
         },
         'filter': filter
       });
@@ -444,32 +501,60 @@ function togglesmur(smurId, visible) {
       map.setLayoutProperty(smurId, 'visibility', 'visible');
     }
 
-    // Charger et filtrer la couche "isochrones_SMUR_30min"
+    // Charger et filtrer la couche "isochrones_SMUR_30min" ou "isochrones_heliSMUR_30min" selon le type de SMUR
     const ville = feature.properties.Ville;
+    const smur = feature.properties.SMUR;
     const isochroneLayerId = 'iso30_' + smurId;
     
-    if (!selectedIsochroneLayers[smurId]) {
-      // Si la couche d'isochrone n'est pas déjà chargée
-      if (!map.getLayer(isochroneLayerId)) {
-        map.addLayer({
-          'id': isochroneLayerId,
-          'type': 'fill',
-          'source': 'source_iso30',
-          'paint': {
-            'fill-color': '#80BF7E', // Couleur de remplissage de l'isochrone
-            'fill-opacity': 0.3
-          },
-          'filter': ['==', 'layer', ville] // Filtrer sur le champ "layer" égal à la ville du SMUR sélectionné
-        });
+    if (feature.properties.field_1 === 'SMUR Bretagne'){ 
+      if (!selectedIsochroneLayers[smurId]) {
+        // Si la couche d'isochrone n'est pas déjà chargée
+        if (!map.getLayer(isochroneLayerId)) {
+          map.addLayer({
+            'id': isochroneLayerId,
+            'type': 'fill',
+            'source': 'source_iso30',
+            'paint': {
+              'fill-color': '#80BF7E', // Couleur de remplissage de l'isochrone
+              'fill-opacity': 0.3
+            },
+            'filter': ['==', 'layer', ville] // Filtrer sur le champ "layer" égal à la ville du SMUR sélectionné
+          });
+        } else {
+          // Si la couche est déjà chargée, assurez-vous qu'elle est visible
+          map.setLayoutProperty(isochroneLayerId, 'visibility', 'visible');
+        }
+        // Stocker l'ID de la couche d'isochrone associée à ce SMUR
+        selectedIsochroneLayers[smurId] = isochroneLayerId;
       } else {
-        // Si la couche est déjà chargée, assurez-vous qu'elle est visible
-        map.setLayoutProperty(isochroneLayerId, 'visibility', 'visible');
+        // Si la couche d'isochrone est déjà chargée, assurez-vous qu'elle est visible
+        map.setLayoutProperty(selectedIsochroneLayers[smurId], 'visibility', 'visible');
       }
-      // Stocker l'ID de la couche d'isochrone associée à ce SMUR
-      selectedIsochroneLayers[smurId] = isochroneLayerId;
-    } else {
-      // Si la couche d'isochrone est déjà chargée, assurez-vous qu'elle est visible
-      map.setLayoutProperty(selectedIsochroneLayers[smurId], 'visibility', 'visible');
+    } else if (feature.properties.field_1 === 'Dragon' || feature.properties.field_1 === 'HéliSMUR'){
+      if (!selectedIsochroneHeliLayers[smurId]) {
+        // Si la couche d'isochrone n'est pas déjà chargée
+        const isochroneHeliLayerId = 'iso30_' + smurId;
+        if (!map.getLayer(isochroneHeliLayerId)) {
+          map.addLayer({
+            'id': isochroneHeliLayerId,
+            'type': 'fill',
+            'source': 'source_heliiso30',
+            'paint': {
+              'fill-color': '#80BF7E', // Couleur de remplissage de l'isochrone
+              'fill-opacity': 0.3
+            },
+            'filter': ['==', 'SMUR', smur] // Filtrer sur le champ "layer" égal à la ville du SMUR sélectionné
+          });
+        } else {
+          // Si la couche est déjà chargée, assurez-vous qu'elle est visible
+          map.setLayoutProperty(isochroneHeliLayerId, 'visibility', 'visible');
+        }
+        // Stocker l'ID de la couche d'isochrone associée à ce SMUR
+        selectedIsochroneHeliLayers[smurId] = isochroneHeliLayerId;
+      } else {
+        // Si la couche d'isochrone est déjà chargée, assurez-vous qu'elle est visible
+        map.setLayoutProperty(selectedIsochroneHeliLayers[smurId], 'visibility', 'visible');
+      }
     }
 
     // Stocker l'ID de la couche SMUR spécifique
@@ -487,16 +572,14 @@ function togglesmur(smurId, visible) {
       map.removeLayer(selectedIsochroneLayers[smurId]);
       delete selectedIsochroneLayers[smurId];
     }
+    // Si la couche d'isochrone associée à ce SMUR est décochée, masquer et retirer la couche d'isochrone
+    if (selectedIsochroneHeliLayers[smurId]) {
+      map.setLayoutProperty(selectedIsochroneHeliLayers[smurId], 'visibility', 'none');
+      map.removeLayer(selectedIsochroneHeliLayers[smurId]);
+      delete selectedIsochroneHeliLayers[smurId];
+    }
   }
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -646,28 +729,34 @@ map.on('click', function(e) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-// //popup smur
-// map.on('click', 'smur', function (e) {
-//   var coordinates = e.features[0].geometry.coordinates.slice();
-//   var description = e.features[0].properties.description;
-//   var nomsmur = e.features[0].properties.name; 
-//   var telephone = e.features[0].properties.phone; 
-//   var site_web = e.features[0].properties.website;
-//   var displaySiteWeb = site_web.length > 20 ? site_web.substring(0, 20) + "..." : site_web; /* Le lien hypertexte mais raccourci*/
-  
-//   // Créez le contenu HTML pour le popup
-//   var popupContent = "<div class='popup'>";
-//   popupContent += "<h3>" + nomsmur + "</h3>";
-//   popupContent += "<p class='info'>Téléphone : " + telephone +"</p>";
-//   popupContent += "<p class='info'>Site Web : <a href='" + site_web + "' target='_blank'>" + displaySiteWeb + "</a></p>";
-//   popupContent += "</div>";
+//popup smur
+map.on('click', 'smur', function (e) {
+  var feature = e.features[0]; // Récupérer la fonctionnalité à partir de l'événement
 
-//   // Créez une popup et attachez-la à l'élément cliqué
-//   new mapboxgl.Popup()
-//     .setLngLat(coordinates)
-//     .setHTML(popupContent)
-//     .addTo(map);
-// });
+  // Vérifier si la fonctionnalité est définie
+  if (!feature) {
+    return;
+  }
+
+  var coordinates = feature.geometry.coordinates;
+  var nomsmur = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase()); 
+  var type = feature.properties.field_1; 
+  //var equip = feature.properties.equip; //A ajouter quand on aura le nb de véhicules par smur
+  
+  // Créez le contenu HTML pour le popup
+  var popupContent = "<div class='popup'>";
+  popupContent += "<h3>" + nomsmur + "</h3>";
+  popupContent += "<p class='info'>Type : " + type +"</p>";
+  popupContent += "<p class='info'>Nombre d'équipements : </p>";
+  popupContent += "</div>";
+
+  // Créez une popup et attachez-la à l'élément cliqué
+  new mapboxgl.Popup()
+    .setLngLat(coordinates)
+    .setHTML(popupContent)
+    .addTo(map);
+});
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -712,7 +801,7 @@ fetch('https://api.mapbox.com/isochrone/v1/mapbox/driving-traffic/' + center.joi
     // Effectuer le "fly to" vers les coordonnées du centre avec un zoom personnalisé
     map.flyTo({
       center: center,
-      zoom: 10, // Ajuster le niveau de zoom selon vos besoins
+      zoom: 9, // Ajuster le niveau de zoom selon vos besoins
       speed: 0.5 // Ajuster la vitesse d'animation selon vos besoins
     });
   });
