@@ -64,7 +64,7 @@
                     </label>
                     <label class='toggle-container'>
                         <input name='profile' type='radio' value='driving' checked>
-                        <div class='toggle toggle--active-null toggle--null'>SMUR VL</div>
+                        <div class='toggle toggle--active-null toggle--null'>SMUR terrestre</div>
                     </label>
                 </div>
                 <h1>Choisir une durée:</h1>
@@ -95,10 +95,10 @@
         <div id="layerList-container">
           <button onclick="toggleLayerList()" class="droplist">Afficher/masquer les couches</button>
           <div id="layerListContent" class="hiddenList">
-            <h2>SAU</h2>
-            <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">Afficher/masquer tous les SAU
-            <h2>SMUR</h2>
-            <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>Afficher/masquer tous les SMUR
+            <input type="checkbox" id="depLayer" onchange="toggleLayer('dep')">Départements<br>
+            <input type="checkbox" id="tsLayer" onchange="toggleLayer('TerritoiresSA')">Territoires de santé<br>
+            <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">SAU<br>
+            <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>SMUR<br>
             <h2>Véhicules SMUR de Bretagne</h2>
             <div id="vehismurList"></div>
             <h2>HéliSMUR ou Dragons</h2>
