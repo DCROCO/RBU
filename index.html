@@ -54,7 +54,7 @@
         <div id="menu-items" class="menu-items">
           <h5>__________________________________________________________</h5>
             <form id='params'>
-              <h4>Options pour le calcul d'isochrones</h4>
+              <h4>Paramètres pour la sectorisation des SMUR</h4>
               <h6>____________</h6>
                 <h1>Choisir un mode :</h1>
                 <div class='mb12 mr12 toggle-group align-center'>
@@ -84,25 +84,23 @@
                 </div>
                 <h6>____________</h6>
             </form>
-            <h4>Couverture des SMUR</h4>
           <div class="dropdown-container">
-              <button onclick="toggleDropdownIso()" class="dropbtn">Choix du SMUR</button>
-              <div id="myDropdown" class="dropdown-content">
-              </div>
+              <button onclick="toggleDropdownIso()" class="dropbtn">Sélectionner un SMUR</button>
+              <div id="myDropdown" class="dropdown-content"></div>
           </div>
         <h5>__________________________________________________________</h5>
-        <h4>Sélection d'un SMUR</h4>
         <div id="layerList-container">
-          <button onclick="toggleLayerList()" class="droplist">Afficher/masquer les couches</button>
+          <button onclick="toggleLayerList()" class="droplist">Liste de couches sélectionnables</button>
           <div id="layerListContent" class="hiddenList">
             <input type="checkbox" id="depLayer" onchange="toggleLayer('dep')">Départements<br>
-            <input type="checkbox" id="tsLayer" onchange="toggleLayer('TerritoiresSA')">Territoires de santé<br>
+            <input type="checkbox" id="routesLayer" onchange="toggleLayer('routes')" >Routes<br>
             <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">SAU<br>
             <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>SMUR<br>
-            <h2>Véhicules SMUR de Bretagne</h2>
-            <div id="vehismurList"></div>
+            <input type="checkbox" id="tsLayer" onchange="toggleLayer('TerritoiresSA')">Territoires de santé<br>
             <h2>HéliSMUR ou Dragons</h2>
             <div id="helismurList"></div>
+            <h2>SMUR terrestre de Bretagne</h2>
+            <div id="vehismurList"></div>
           </div>
         </div>
       </div>
