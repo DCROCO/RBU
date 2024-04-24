@@ -15,7 +15,7 @@ var map = new mapboxgl.Map({
     zoom: 7, // zoom
     pitch: 0, // Inclinaison
     bearing: 0, // Rotation
-    customAttribution: '<a href="https://rbu.jimdo.com//">Réseau Bretagne Urgence</a>'
+    customAttribution: '<a href="https://rbu.jimdo.com//">Réseau Bretagne Urgences</a>'
 });
 
 
@@ -83,7 +83,7 @@ map.on ('load', function() {
   });
 
   //ajout des routes
-  map.addSource('mapbox-streets-v8', {
+  map.addSource('source_routes', {
     type: 'vector',
     url: 'mapbox://mapbox.mapbox-streets-v8'
   });        
@@ -91,10 +91,10 @@ map.on ('load', function() {
   map.addLayer({
     "id": "routes",
     "type": "line",
-    "source": "mapbox-streets-v8",
+    "source": "source_routes",
     "source-layer": "road",
     "filter": ["all",  ["in", "class", "primary", "motorway", "secondary", "trunk", "tertiary"]],        
-    "layout": {'visibility': 'visible'},
+    "layout": {'visibility': 'none'},
     'paint': {'line-color': [
 	    'match',['get', 'class'],
       'motorway', '#E990A0',
@@ -141,8 +141,8 @@ map.on ('load', function() {
       'icon-image': ['match', ['get', 'field_1'], 
                     'SMUR Bretagne', 'custom-marker-1', 
                     'SMUR Limitrophes', 'custom-marker-2',
-                    'HéliSMUR', 'custom-marker-3',
-                    'Dragon', 'custom-marker-4',
+                    'Dragon', 'custom-marker-3',
+                    'HéliSMUR', 'custom-marker-4',
                     'default-marker'],
       'icon-size': 0.8,
       'icon-allow-overlap': true,
@@ -373,6 +373,13 @@ DepCheckbox.addEventListener("change", function () {
   toggleLayer('dep', visible);
 });
 
+// Afficher/masquer les routes
+const routesCheckbox = document.getElementById("routesLayer");
+routesCheckbox.addEventListener("change", function () {
+  const visible = routesCheckbox.checked;
+  toggleLayer('routes', visible);
+});
+
 // Fonction pour activer la checkbox des couches
 function toggleLayer(layerId, visible) {
   const layer = map.getLayer(layerId);
@@ -384,7 +391,7 @@ function toggleLayer(layerId, visible) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////:///// CODE POUR LISTER TOUS LES SMUR ////////////////////////////////////
+/////////////////////////////////// CODE POUR LISTER TOUS LES SMUR ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -471,10 +478,10 @@ function togglesmur(smurId, visible) {
       case 'SMUR Limitrophes':
         iconImage = 'custom-marker-2';
         break;
-      case 'HéliSMUR':
+      case 'Dragon':
         iconImage = 'custom-marker-3';
         break;
-      case 'Dragon':
+      case 'HéliSMUR':
         iconImage = 'custom-marker-4';
         break;
       default:
