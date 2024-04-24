@@ -127,7 +127,7 @@ map.on ('load', function() {
     if (error) throw error;
     map.addImage('custom-marker-3', image);
   });
-  map.loadImage('./DATA/Hélismur.png', function(error, image) {
+  map.loadImage('./DATA/HéliSMUR.png', function(error, image) {
     if (error) throw error;
     map.addImage('custom-marker-4', image);
   });
