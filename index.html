@@ -93,6 +93,7 @@
           <button onclick="toggleLayerList()" class="droplist">Liste de couches sélectionnables</button>
           <div id="layerListContent" class="hiddenList">
             <input type="checkbox" id="depLayer" onchange="toggleLayer('dep')">Départements<br>
+            <input type="checkbox" id="smurisoLayer" onchange="toggleLayer('smuriso')">Couverture 30min SMUR terrestres<br>
             <input type="checkbox" id="routesLayer" onchange="toggleLayer('routes')" >Routes<br>
             <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">SAU<br>
             <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>SMUR<br>
@@ -101,6 +102,8 @@
             <div id="helismurList"></div>
             <h2>SMUR terrestre de Bretagne</h2>
             <div id="vehismurList"></div>
+            <h2>SMUR terrestre limitrophes</h2>
+            <div id="vehismurlimList"></div>
           </div>
         </div>
       </div>

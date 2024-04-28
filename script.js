@@ -108,6 +108,27 @@ map.on ('load', function() {
     }
   });
 
+  //Ajout des iscohrones 30min autour des SMUR terrestres
+  map.addSource('source_iso30', {
+    'type': 'geojson',
+    'data': './DATA/isochrones30_SMUR.geojson'
+  });
+
+  map.addLayer({
+    'id': 'iso30',
+    'type': 'fill',
+    'source': 'source_iso30', 
+    'paint' : {
+      'fill-color' : '#F7ED55',
+      'fill-opacity': 0.5, 
+      'line-color' : '#282DD7',
+      'line-width': 2
+    },
+    'layout': {
+      'visibility': 'none'
+    }
+  });
+
   //Ajout des smur
   map.addSource('source_smur', {
     type: 'geojson',
@@ -144,34 +165,12 @@ map.on ('load', function() {
                     'Dragon', 'custom-marker-3',
                     'HéliSMUR', 'custom-marker-4',
                     'default-marker'],
-      'icon-size': 0.8,
+      'icon-size': 0.9,
       'icon-allow-overlap': true,
       'visibility': 'visible'
     }
   });
 
-  //Ajout des SAMU 
-  map.addSource('source_SAMU', {
-    'type': 'geojson',
-    'data': './DATA/samuok.geojson'
-  });
-
-  map.loadImage('./DATA/SAMU.png', function(error, image) {
-    if (error) throw error;
-    map.addImage('custom-marker', image);
-  });
-
-  map.addLayer({
-    'id': 'SAMU',
-    'type': 'symbol',
-    'source': 'source_SAMU',
-    'layout': {
-      'icon-image': 'custom-marker',
-      'icon-size': 0.8,
-      'icon-allow-overlap': true,
-      'visibility': 'none'
-    }
-  });
 
   //Ajout des sau bretons
   map.addSource('source_sau', {
@@ -208,64 +207,20 @@ map.on ('load', function() {
     }
   });
 
-  //Ajout des sau limitrophes
-  map.addSource('source_saulim', {
-    'type': 'geojson',
-    'data': './DATA/sau_limitrophesok.geojson'
-  });
-
-  map.addLayer({
-    'id': 'sau_lim',
-    'type': 'symbol',
-    'source': 'source_saulim',
-    'layout': {
-      'icon-image': ['match', ['get', 'Statut'], 
-                     'privé', 'custom-marker-a', 
-                     'public', 'custom-marker-b',
-                     'militaire', 'custom-marker-c',
-                     'default-marker'], 
-      'icon-size': 0.7,
-      'icon-allow-overlap': true,
-      'visibility': 'none'
-    }
-  });
-
-  //Ajout des iscohrones 30min autour des SMUR terrestres
-  map.addSource('source_iso30', {
-    'type': 'geojson',
-    'data': './DATA/isochrones_SMUR_30min.geojson'
-  });
-
-  map.addLayer({
-    'id': 'iso30',
-    'type': 'fill',
-    'source': 'source_iso30', 
-    'paint' : {
-      'fill-color': 'blue'
-    },
-    'layout': {
-      'visibility': 'none'
-    }
-  });
-
   //Ajout des iscohrones 30min autour des héliSMUR
   map.addSource('source_heliiso30', {
     'type': 'geojson',
-    'data': './DATA/isochrones_heliSMUR_30min.geojson'
+    'data': './DATA/isochrones30_heliSMUR.geojson'
   });
 
   map.addLayer({
     'id': 'heliiso30',
     'type': 'fill',
     'source': 'source_heliiso30', 
-    'paint' : {
-      'fill-color': 'green'
-    },
     'layout': {
       'visibility': 'none'
     }
   });
-
 
   // Ajout isochrone pour le menu deroulant 
   map.addSource('iso', {
@@ -380,6 +335,13 @@ routesCheckbox.addEventListener("change", function () {
   toggleLayer('routes', visible);
 });
 
+// Afficher/masquer les isochrones SMUR terrestres
+const smurisoCheckbox = document.getElementById("smurisoLayer");
+smurisoCheckbox.addEventListener("change", function () {
+  const visible = smurisoCheckbox.checked;
+  toggleLayer('iso30', visible);
+});
+
 // Fonction pour activer la checkbox des couches
 function toggleLayer(layerId, visible) {
   const layer = map.getLayer(layerId);
@@ -407,6 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Trier les fonctionnalités en fonction du champ 'SMUR'
     data.features.sort((a, b) => a.properties.SMUR.localeCompare(b.properties.SMUR));
     generatevehismurOptions(smurData);
+    generatevehismurlimOptions(smurData);
     generatehelismurOptions(smurData);
   })
   .catch((error) => {
@@ -414,11 +377,30 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// Fonction pour générer les options du menu déroulant pour la liste des véhicules SMUR
+// Fonction pour générer les options du menu déroulant pour la liste des véhicules SMUR de Bretagne
 function generatevehismurOptions(data) {
   const smurListe = document.getElementById("vehismurList");
   data.features.forEach(feature => {
     if (feature.properties.fid != null && feature.properties.field_1 === 'SMUR Bretagne') { 
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = `smur-${feature.properties.fid}`;
+      checkbox.onchange = () => togglesmur(`smur-${feature.properties.fid}`, checkbox.checked);
+      const label = document.createElement("label");
+      label.htmlFor = `smur-${feature.properties.fid}`;
+      label.textContent = capitalizeFirstLetter(feature.properties.SMUR.toLowerCase());
+      smurListe.appendChild(checkbox);
+      smurListe.appendChild(label);
+      smurListe.appendChild(document.createElement("br"));
+    }
+  });
+}
+
+// Fonction pour générer les options du menu déroulant pour la liste des véhicules SMUR de Bretagne
+function generatevehismurlimOptions(data) {
+  const smurListe = document.getElementById("vehismurlimList");
+  data.features.forEach(feature => {
+    if (feature.properties.fid != null && feature.properties.field_1 === 'SMUR Limitrophes') { 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.id = `smur-${feature.properties.fid}`;
@@ -452,13 +434,14 @@ function generatehelismurOptions(data) {
   });
 }
 
+
+// Stocker le niveau de zoom initial de la carte
+const initialZoom = map.getZoom();
 // Tableau pour stocker les identifiants des couches SMUR sélectionnées
 let selectedSmurLayers = [];
-
 // Tableau pour stocker les identifiants des couches d'isochrones associées à chaque SMUR terrestres
 let selectedIsochroneLayers = {};
-
-// Tableau pour stocker les identifiants des couches d'isochrones associées à chaque SMUR terrestres
+// Tableau pour stocker les identifiants des couches d'isochrones associées à chaque SMUR hélicoptés
 let selectedIsochroneHeliLayers = {};
 
 // Fonction pour afficher/masquer un SMUR spécifique
@@ -488,32 +471,13 @@ function togglesmur(smurId, visible) {
         iconImage = 'default-marker';
         break;
     }
-    
-    // Ajouter la couche SMUR spécifique si elle n'est pas déjà ajoutée
-    if (!map.getLayer(smurId)) {
-      map.addLayer({
-        'id': smurId,
-        'type': 'symbol',
-        'source': 'source_smur',
-        'layout': {
-          'icon-image': iconImage,
-          'icon-size': 0.8,
-          'icon-allow-overlap': true,
-          'visibility': 'visible' 
-        },
-        'filter': filter
-      });
-    } else {
-      // Si la couche existe déjà, assurez-vous qu'elle est visible
-      map.setLayoutProperty(smurId, 'visibility', 'visible');
-    }
 
-    // Charger et filtrer la couche "isochrones_SMUR_30min" ou "isochrones_heliSMUR_30min" selon le type de SMUR
+    // Charger et filtrer la couche "isochrones30_SMUR" ou "isochrones_heliSMUR_30min" selon le type de SMUR
     const ville = feature.properties.Ville;
     const smur = feature.properties.SMUR;
     const isochroneLayerId = 'iso30_' + smurId;
     
-    if (feature.properties.field_1 === 'SMUR Bretagne'){ 
+    if (feature.properties.field_1 === 'SMUR Bretagne' ||feature.properties.field_1 === 'SMUR Limitrophes'){ 
       if (!selectedIsochroneLayers[smurId]) {
         // Si la couche d'isochrone n'est pas déjà chargée
         if (!map.getLayer(isochroneLayerId)) {
@@ -522,8 +486,8 @@ function togglesmur(smurId, visible) {
             'type': 'fill',
             'source': 'source_iso30',
             'paint': {
-              'fill-color': '#80BF7E', // Couleur de remplissage de l'isochrone
-              'fill-opacity': 0.3
+              'fill-color': '#F7ED55', // Couleur de remplissage de l'isochrone
+              'fill-opacity': 0.5
             },
             'filter': ['==', 'layer', ville] // Filtrer sur le champ "layer" égal à la ville du SMUR sélectionné
           });
@@ -533,10 +497,18 @@ function togglesmur(smurId, visible) {
         }
         // Stocker l'ID de la couche d'isochrone associée à ce SMUR
         selectedIsochroneLayers[smurId] = isochroneLayerId;
+        // Déplacer la carte vers les coordonnées du SMUR
+        map.flyTo({
+          center: feature.geometry.coordinates,
+          zoom: 9, // Zoom désiré
+          speed: 0.75, // Vitesse de déplacement
+          essential: true // Animation "fly to" essentielle
+        });        
       } else {
         // Si la couche d'isochrone est déjà chargée, assurez-vous qu'elle est visible
         map.setLayoutProperty(selectedIsochroneLayers[smurId], 'visibility', 'visible');
       }
+
     } else if (feature.properties.field_1 === 'Dragon' || feature.properties.field_1 === 'HéliSMUR'){
       if (!selectedIsochroneHeliLayers[smurId]) {
         // Si la couche d'isochrone n'est pas déjà chargée
@@ -547,8 +519,8 @@ function togglesmur(smurId, visible) {
             'type': 'fill',
             'source': 'source_heliiso30',
             'paint': {
-              'fill-color': '#80BF7E', // Couleur de remplissage de l'isochrone
-              'fill-opacity': 0.3
+              'fill-color': '#F7ED55', // Couleur de remplissage de l'isochrone
+              'fill-opacity': 0.5
             },
             'filter': ['==', 'SMUR', smur] // Filtrer sur le champ "layer" égal à la ville du SMUR sélectionné
           });
@@ -556,6 +528,13 @@ function togglesmur(smurId, visible) {
           // Si la couche est déjà chargée, assurez-vous qu'elle est visible
           map.setLayoutProperty(isochroneHeliLayerId, 'visibility', 'visible');
         }
+        // Déplacer la carte vers les coordonnées du SMUR
+        map.flyTo({
+          center: feature.geometry.coordinates,
+          zoom: 8, // Zoom désiré
+          speed: 0.75, // Vitesse de déplacement
+          essential: true // Animation "fly to" essentielle
+        });
         // Stocker l'ID de la couche d'isochrone associée à ce SMUR
         selectedIsochroneHeliLayers[smurId] = isochroneHeliLayerId;
       } else {
@@ -563,9 +542,30 @@ function togglesmur(smurId, visible) {
         map.setLayoutProperty(selectedIsochroneHeliLayers[smurId], 'visibility', 'visible');
       }
     }
-
+    
     // Stocker l'ID de la couche SMUR spécifique
     selectedSmurLayers[smurId] = smurId;
+
+
+    // Ajouter la couche SMUR spécifique si elle n'est pas déjà ajoutée
+    if (!map.getLayer(smurId)) {
+      map.addLayer({
+        'id': smurId,
+        'type': 'symbol',
+        'source': 'source_smur',
+        'layout': {
+          'icon-image': iconImage,
+          'icon-size': 0.9,
+          'icon-allow-overlap': true,
+          'visibility': 'visible' 
+        },
+        'filter': filter
+      });
+    } else {
+      // Si la couche existe déjà, assurez-vous qu'elle est visible
+      map.setLayoutProperty(smurId, 'visibility', 'visible');
+    }
+
   } else {
     // Si la couche SMUR spécifique est décochée, masquer et retirer la couche SMUR
     map.setLayoutProperty(smurId, 'visibility', 'none');
@@ -585,6 +585,15 @@ function togglesmur(smurId, visible) {
       map.removeLayer(selectedIsochroneHeliLayers[smurId]);
       delete selectedIsochroneHeliLayers[smurId];
     }
+    
+    // Supprimer les identifiants de couche SMUR spécifique
+    delete selectedSmurLayers[smurId];
+
+    // Revenir au zoom initial
+    map.flyTo({
+      zoom: initialZoom, // Utiliser le zoom initial
+      essential: true // Animation "fly to" essentielle
+    });
   }
 }
 
