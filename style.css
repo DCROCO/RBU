@@ -57,18 +57,40 @@
   opacity : 0.9;
 }
 
-/* style liste deroulante */
+/* style du bouton */
 .dropbtn {
   margin : 10px;
   background-color: #f2a11f;
   color: white;
   padding: 5px 5px;
   font-size: 13px;
+  width : 190px;
   font-weight: bold;
   border-radius: 5px;
   border: none;
-  width : 220px;
   text-align: center;
+}
+
+/* style bouton supprimer*/
+.supprimer {
+  margin : 10px;
+  background-color: #f2a11f;
+  padding: 4px 5px;
+  width : 40px;
+  border-radius: 5px;
+  border: none;
+}
+
+/* Style pour l'icon poubelle */
+.iconpoubelle {
+  width: 19px !important; /* Largeur souhaitée */
+  height: 21px !important; /* Hauteur souhaitée */
+  vertical-align: middle !important; /* Alignement vertical avec le texte */
+}
+
+/* Style du formulaire */
+#choixsmur, #choixtempssmur, #choixtempsheli {
+  font-size: 12px;
 }
 
 /*couleur de fond lorsque l'on passe sur la liste deroulante*/
@@ -84,7 +106,8 @@
 }
 
 .dropdown-container {
-  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 /* Liste déroulante */
@@ -92,7 +115,7 @@
   display: none;
   position: absolute;
   background-color: #f9f9f9;
-  width: 235px;
+  width: 190px;
   max-height: 200px; /* Hauteur maximale de la liste déroulante */
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
@@ -119,30 +142,6 @@
 /* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
 .show {
   display:block;
-}
-
-/* style liste deroulante */
-.droplist {
-  background-color: #f2a11f;
-  color: white;
-  padding: 5px 5px;
-  font-size: 13px;
-  font-weight: bold;
-  border-radius: 5px;
-  border: none;
-  width : 220px;
-  text-align: center;
-  margin : 10px;
-}
-
-/*couleur de fond lorsque l'on passe sur la liste deroulante*/
-.droplist:hover, .droplist:focus {
-  background-color: #b57205;
-}
-
-/*position de la popup menu deroulant*/
-#layerList-container {
-  position: relative;
 }
 
 #layerListContent {
@@ -178,9 +177,63 @@
   background-color: #f2a11f;
 }
 
-/* Show the dropdown menu (use JS to add this class to the dropdown-content container when the user clicks on the button) */
-.show2 {
-  display:block;
+/* Cacher les sous-listes par défaut */
+ul {
+  display: none;
+}
+
+/* Afficher les sous-listes lorsqu'elles sont ouvertes */
+ul.show {
+  display: block;
+}
+
+/* Style pour l'icon hélismur */
+.iconhelismur {
+  width: 24px !important; /* Largeur souhaitée */
+  height: 26px !important; /* Hauteur souhaitée */
+  margin-right: 3px !important; /* Espace à droite de l'icône pour séparer du texte */
+  vertical-align: middle !important; /* Alignement vertical avec le texte */
+}
+
+/*Style pour l'icon des données générales*/
+.icongeneral {
+  width: 16px !important; /* Largeur souhaitée */
+  height: 16px !important; /* Hauteur souhaitée */
+  margin-left : 7px;
+  margin-right: 5px !important; /* Espace à droite de l'icône pour séparer du texte */
+  vertical-align: middle !important; /* Alignement vertical avec le texte */
+}
+
+/*Style pour l'icon smur bretagne'*/
+.iconsmur {
+  width: 17px !important; /* Largeur souhaitée */
+  height: 13px !important; /* Hauteur souhaitée */
+  margin-left : 5px;
+  margin-right: 9px !important; /* Espace à droite de l'icône pour séparer du texte */
+  vertical-align: middle !important; /* Alignement vertical avec le texte */
+}
+
+/*Style pour l'icon smur limitrophes*/
+.iconsmurlim {
+  width: 17px !important; /* Largeur souhaitée */
+  height: 13px !important; /* Hauteur souhaitée */
+  margin-left : 5px;
+  margin-right: 6px !important; /* Espace à droite de l'icône pour séparer du texte */
+  vertical-align: middle !important; /* Alignement vertical avec le texte */
+}
+
+/* Style pour les titres de liste */
+.list-title {
+  display: inline-block !important; /* Affichage en ligne pour aligner l'icône et le texte */
+  vertical-align: middle !important; /* Alignement vertical avec l'icône */
+}
+
+
+
+/* Style pour les titres de liste */
+.list-title {
+  display: inline-block; /* Pour aligner le titre et l'icône sur la même ligne */
+  vertical-align: middle; /* Pour aligner verticalement l'icône et le texte */
 }
 
 .config-panel{
@@ -199,6 +252,7 @@
 #isochrone-time-select{
   color:#6b6b6b;
   border-color: white;
+  right : 5px;
 }
 
 /*Définition de la fenetre du menu*/
@@ -213,7 +267,6 @@
   overflow-x: hidden;
   z-index: 1000;
   padding-top: 10px;
-  
 }
 
 /*Gestion du titre du menu*/
@@ -269,7 +322,7 @@
 /*Gestion des titres des élements du menu*/
 .menu-items h4 { 
   padding: 5px ;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: bold;
 }
 
@@ -279,8 +332,9 @@
   font-weight: bold;
 }
 .menu-items h2 {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
+  line-height: 30px;
 }
 /*Gestion des barres qui sépare les groupe d'élements*/
 .menu-items h5 {
