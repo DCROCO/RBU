@@ -21,6 +21,7 @@
 <link href='https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.min.css' rel='stylesheet'>
 <script src='https://api.mapbox.com/mapbox-assembly/v1.3.0/assembly.js'></script>
 <script src='https://api.mapbox.com/mapbox.js/plugins/mapbox-isochrone/v1.0.0/mapbox-isochrone.js'></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
 
 <script> function openNav() {
   document.getElementById("menu").style.width = "250px";
@@ -53,61 +54,89 @@
         </a>
         <div id="menu-items" class="menu-items">
           <h5>__________________________________________________________</h5>
-            <form id='params'>
-              <h4>Paramètres pour la sectorisation des SMUR</h4>
-              <h6>____________</h6>
-                <h1>Choisir un mode :</h1>
-                <div class='mb12 mr12 toggle-group align-center'>
-                    <label class='toggle-container'>
-                        <input name='profile' type='radio' value='walking'>
-                        <div class='toggle toggle--active-null toggle--null'>HELISMUR</div>
-                    </label>
-                    <label class='toggle-container'>
-                        <input name='profile' type='radio' value='driving' checked>
-                        <div class='toggle toggle--active-null toggle--null'>SMUR terrestre</div>
-                    </label>
-                </div>
-                <h1>Choisir une durée:</h1>
-                <div class='mb12 mr12 toggle-group align-center'>
-                    <label class='toggle-container'>
-                        <input name='duration' type='radio' value='30' checked>
-                        <div class='toggle toggle--active-null toggle--null'>30 min</div>
-                    </label>
-                    <label class='toggle-container'>
-                        <input name='duration' type='radio' value='45'>
-                        <div class='toggle toggle--active-null toggle--null'>45 min</div>
-                    </label>
-                    <label class='toggle-container'>
-                        <input name='duration' type='radio' value='60'>
-                        <div class='toggle toggle--active-null toggle--null'>60 min</div>
-                    </label>
-                </div>
-                <h6>____________</h6>
-            </form>
+          <br>
+          <form id="transport">
+            <h4>Paramètres pour la sectorisation des SMUR</h4>
+            <hr>
+            <h2>Choisir un mode :</h2>
+            <div id="choixsmur">
+              <label><input type="radio" name="mode" value="helismur" id="btnHelismur">HéliSMUR</label>
+              <label><input type="radio" name="mode" value="smurTerrestres" id="btnSmurTerrestres" checked>SMUR terrestres</label>
+            </div>
+            <hr>
+          </form>
+          <form id="tempssmur">
+            <h2>Choisir un temps :</h2>
+            <div id="choixtempssmur">
+              <label><input type="radio" name="mode" value="30" id="btn30" checked>30min</label>
+              <label><input type="radio" name="mode" value="45" id="btn45">45min</label>
+              <label><input type="radio" name="mode" value="60" id="btn60">60min</label>
+            </div>
+            <hr>
+          </form>
+          <form id="tempsheli">
+            <h2>Choisir un temps :</h2>
+            <div id="choixtempsheli">
+              <label><input type="radio" name="mode" value="10" id="btn10" checked>10min</label>
+              <label><input type="radio" name="mode" value="15" id="btn15">15min</label>
+              <label><input type="radio" name="mode" value="20" id="btn20">20min</label>
+            </div>
+            <hr>
+          </form>
           <div class="dropdown-container">
-              <button onclick="toggleDropdownIso()" class="dropbtn">Sélectionner un SMUR</button>
-              <div id="myDropdown" class="dropdown-content"></div>
+            <button id="toggleDropdownIso" class="dropbtn">Sélectionner un SMUR</button>
+            <div id="myDropdown" class="dropdown-content"></div>
+            <button id="delete" class="supprimer"><img src="./DATA/poubelle.png" alt="Icon poubelle" class="iconpoubelle"></button>
           </div>
+        <br>
         <h5>__________________________________________________________</h5>
-        <div id="layerList-container">
-          <button onclick="toggleLayerList()" class="droplist">Liste de couches sélectionnables</button>
-          <div id="layerListContent" class="hiddenList">
-            <input type="checkbox" id="depLayer" onchange="toggleLayer('dep')">Départements<br>
-            <input type="checkbox" id="smurisoLayer" onchange="toggleLayer('smuriso')">Couverture 30min SMUR terrestres<br>
-            <input type="checkbox" id="routesLayer" onchange="toggleLayer('routes')" >Routes<br>
-            <input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">SAU<br>
-            <input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>SMUR<br>
-            <input type="checkbox" id="tsLayer" onchange="toggleLayer('TerritoiresSA')">Territoires de santé<br>
-            <h2>HéliSMUR ou Dragons</h2>
+        <br>
+        <h4>Données visualisables :</h4>
+        <div id="layerListContent" class="hiddenList">
+          <h2 onclick="toggleGroup('general')">
+            <img src="./DATA/donnees_generales.png" alt="Icone donnees" class="icongeneral">
+            <span class="list-title"></span>
+            Données générales
+          </h2>
+          <div id="general">
+            <ul>
+              <li><input type="checkbox" id="comLayer" onchange="toggleLayer('communes')">Communes</li>
+              <li><input type="checkbox" id="depLayer" onchange="toggleLayer('dep')">Départements</li>
+              <li><input type="checkbox" id="smurisoLayer" onchange="toggleLayer('smuriso')">Couverture 30min SMUR terrestres</li>
+              <li><input type="checkbox" id="routesLayer" onchange="toggleLayer('routes')" >Routes</li>
+              <li><input type="checkbox" id="sauLayer" onchange="toggleLayer('sau')">SAU</li>
+              <li><input type="checkbox" id="smurLayer" onchange="toggleLayer('smur')" checked>SMUR</li>
+              <li><input type="checkbox" id="tsLayer" onchange="toggleLayer('TerritoiresSA')">Territoires de santé</li>
+            </ul>
+          </div>
+
+          <div id="helismur">
+            <h2 onclick="toggleGroup('helismurList')">
+              <img src="./DATA/HéliSMUR.png" alt="Icone HéliSMUR" class="iconhelismur">
+              <span class="list-title"></span>
+              HéliSMUR ou Dragons
+            </h2>
             <div id="helismurList"></div>
-            <h2>SMUR terrestre de Bretagne</h2>
+          </div>
+        
+          <div id="smurbretagne">
+            <img src="./DATA/SMUR.png" alt="Icone SMUR Bretagne" class="iconsmur">
+            <!-- Ajouter la classe "list-title" au texte du titre de la liste -->
+            <h2 onclick="toggleGroup('vehismurList')" class="list-title">Véhicules SMUR de Bretagne</h2>
             <div id="vehismurList"></div>
-            <h2>SMUR terrestre limitrophes</h2>
+          </div>
+          
+          <div id="smurlimitrophes">
+            <h2 onclick="toggleGroup('vehismurlimList')">
+              <img src="./DATA/SMUR_limitrophes.png" alt="Icone SMUR limitrophes" class="iconsmurlim">
+              <span class="list-title"></span>
+              Véhicules SMUR limitrophes</h2>
             <div id="vehismurlimList"></div>
           </div>
+
         </div>
-      </div>
     </div>   
+  </div>
   <button class="openbtn" onclick="openNav()">
     <div id="menu-icon">
       <span></span>
