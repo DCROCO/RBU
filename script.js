@@ -686,20 +686,30 @@ function togglesmur(smurId, visible) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Définir la fonction pour dérouler la liste
-function toggleDropdownIso() {
+// Sélectionner le bouton "Sélectionner un SMUR"
+const selectSmurButton = document.getElementById('toggleDropdownIso');
+
+// Ajouter un écouteur d'événement sur le bouton "Sélectionner un SMUR"
+selectSmurButton.addEventListener('click', function(e) {
+  e.stopPropagation(); // Empêcher la propagation de l'événement
+
+  // Sélectionner la liste déroulante
   const dropdownContent = document.getElementById('myDropdown');
+
+  // Basculer la visibilité de la liste déroulante
   dropdownContent.classList.toggle('show');
-}
-
-// Sélection du bouton pour dérouler la liste
-const toggleDropdownButton = document.getElementById('toggleDropdownIso');
-
-// Écouteur d'événements pour le clic sur le bouton
-toggleDropdownButton.addEventListener('click', function() {
-  toggleDropdownIso(); // Appeler la fonction pour dérouler la liste
 });
 
+// Ajouter un écouteur d'événement sur le document pour fermer la liste déroulante lorsque l'utilisateur clique en dehors
+document.addEventListener('click', function(e) {
+  // Sélectionner la liste déroulante
+  const dropdownContent = document.getElementById('myDropdown');
+
+  // Vérifier si le clic s'est produit en dehors de la liste déroulante et du bouton "Sélectionner un SMUR"
+  if (!dropdownContent.contains(e.target) && e.target !== selectSmurButton) {
+    dropdownContent.classList.remove('show');
+  }
+});
 
 // Utilisez la fonction fetch() pour récupérer les données SMUR à partir de l'URL
 document.addEventListener('DOMContentLoaded', function() {
@@ -779,7 +789,6 @@ btnheli20.addEventListener('click', function() {
   getIsoHeliSmur20(smurData, 'heli');
 });
 
-
 // Fonction pour effacer le contenu du menu déroulant
 function clearDropdown() {
   const container = document.getElementById('myDropdown');
@@ -791,6 +800,13 @@ function clearDropdown() {
     }
   });
 }
+
+const deletebtn = document.getElementById('delete');
+deletebtn.addEventListener('click', function() {
+  const dropdownContent = document.getElementById('myDropdown');
+  dropdownContent.classList.remove('show');
+});
+
 
 // Fonction pour générer les options du menu déroulant si on sélectionne smur terrestre 30min
 function getIsoSmur30(data, type) {

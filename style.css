@@ -69,16 +69,22 @@
   border-radius: 5px;
   border: none;
   text-align: center;
+  height : 30px;
 }
 
 /* style bouton supprimer*/
 .supprimer {
   margin : 10px;
   background-color: #f2a11f;
-  padding: 4px 5px;
+  padding: 5px 5px;
   width : 40px;
   border-radius: 5px;
   border: none;
+  display: flex; /* Ajouter cette ligne */
+  align-items: center; /* Centrer verticalement l'icône */
+  justify-content: center; /* Centrer horizontalement l'icône */
+  height : 30px;
+
 }
 
 /* Style pour l'icon poubelle */
@@ -106,20 +112,21 @@
 }
 
 .dropdown-container {
+  position: relative; /* Ajouter cette ligne */
   display: flex;
   align-items: center;
 }
 
-/* Liste déroulante */
 .dropdown-content {
   display: none;
   position: absolute;
   background-color: #f9f9f9;
-  width: 190px;
+  width: 180px;
   max-height: 200px; /* Hauteur maximale de la liste déroulante */
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
-  left: 0; /* Align to the left */
+  top: 100%; /* Positionner la liste déroulante sous le bouton */
+  left: 0; /* Aligner la liste déroulante à gauche du bouton */
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
   text-align : left;
 }
