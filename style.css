@@ -21,14 +21,14 @@
   width: 150px;
   box-shadow: 0 0 10px rgba(105, 105, 105, 0.5); /* Ombre */
   z-index: 1;
-  top: -100%; /* Position verticale à 50% */
+  top: -200%; /* Position verticale à 50% */
   left: 0%; /* Position horizontale à 50% */
   transform: translate(-50%, -50%); /* Centrage */
   opacity : 0.9;
 }
 
 .popup h3{
-  font: 13px 'Montserrat', Arial, Helvetica, sans-serif;
+  font: 16px 'Montserrat', Arial, Helvetica, sans-serif;
   text-align : center;
   font-weight : bold;
   color : rgb(255, 255, 255);
@@ -39,6 +39,7 @@
   font: 10px 'Montserrat', Arial, Helvetica, sans-serif;
   margin : 5px;
   color : white;
+  text-align : center;
 }
 
 /* Pointe de la popup */
@@ -155,7 +156,7 @@
   position: absolute;
   left: 0; /* Align to the left */
   background-color: white;
-  max-height: 180px; /* Hauteur maximale de la liste déroulante */
+  max-height: 220px; /* Hauteur maximale de la liste déroulante */
   overflow-y: auto; /* Ajouter une barre de défilement verticale si nécessaire */
   font-size: 12px;
   width : 220px;
@@ -233,14 +234,6 @@ ul.show {
 .list-title {
   display: inline-block !important; /* Affichage en ligne pour aligner l'icône et le texte */
   vertical-align: middle !important; /* Alignement vertical avec l'icône */
-}
-
-
-
-/* Style pour les titres de liste */
-.list-title {
-  display: inline-block; /* Pour aligner le titre et l'icône sur la même ligne */
-  vertical-align: middle; /* Pour aligner verticalement l'icône et le texte */
 }
 
 .config-panel{

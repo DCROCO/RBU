@@ -63,6 +63,24 @@ map.on ('load', function() {
     }
   });
   
+  //Ajout des communes
+  map.addSource('source_com', {
+    'type': 'geojson',
+    'data': './DATA/communes_rang.geojson'
+  });
+  
+  map.addLayer({
+    'id': 'communes', 
+    'type': 'fill',
+    'source': 'source_com',
+    'paint': {
+      'fill-color': 'rgba(61,153,80,0)',
+      'fill-opacity': 0.15,
+      "fill-outline-color": 'grey',
+    },
+    'layout': {'visibility' : 'none'}
+  });
+
   //Ajout des départements
   map.addSource('source_dep', {
     'type': 'geojson',
@@ -380,7 +398,7 @@ DepCheckbox.addEventListener("change", function () {
 const comCheckbox = document.getElementById("comLayer");
 comCheckbox.addEventListener("change", function () {
   const visible = comCheckbox.checked;
-  toggleLayer('communesLayer', visible);
+  toggleLayer('communes', visible);
 });
 
 // Afficher/masquer les routes
@@ -1087,109 +1105,71 @@ deleteButton.addEventListener('click', function() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-d3.csv("./DATA/communes_rang.csv").then(function(csvData) {
-  // Charger les données de communes depuis l'API Opendatasoft
-  fetch("https://data.opendatasoft.com/api/explore/v2.1/catalog/datasets/georef-france-commune@public/exports/geojson?lang=fr&refine=reg_name%3A%22Bretagne%22&facet=facet(name%3D%22reg_name%22%2C%20disjunctive%3Dtrue)&timezone=Europe%2FBerlin")
-    .then(response => response.json())
-    .then(function(geojsonData) {
-      // Ajout des communes
-      map.addLayer({
-        'id': 'communesLayer', // Nom de la couche
-        'type': 'fill',
-        'source': {
-          'type': 'geojson',
-          'data': geojsonData
-        },
-        'paint': {
-          'fill-color': 'rgba(61,153,80,0)',
-          'fill-opacity': 0.15,
-          "fill-outline-color": 'grey',
-        },
-        'layout': {'visibility' : 'none'}
-      });
-
-      // Reste du code pour la fusion des données CSV avec les propriétés GeoJSON
-      const csvDataMap = {};
-      csvData.forEach(function(row) {
-        csvDataMap[row.Nom_com] = row;
-      });
-
-      geojsonData.features.forEach(function(feature) {
-        const communeName = feature.properties['com_name'];
-
-        if (csvDataMap.hasOwnProperty(communeName)) {
-          feature.properties = {...feature.properties, ...csvDataMap[communeName]};
-        }
-      });
 
 
-      // Ajouter l'événement click à la couche communesLayer
-      map.on('click', function(e) {
-        var features = map.queryRenderedFeatures(e.point, {
-          layers: ['communesLayer']
-        });
+// Ajouter l'événement click à la couche communes
+map.on('click', 'communes', function (e) {
+  var feature = e.features[0]; // Récupérer la fonctionnalité à partir de l'événement
 
-        if (features.length > 0) {
-          // Vérifier si la fonctionnalité est définie
-          var feature = features[0];
-          if (!feature) {
-            return;
-          }
+  // Vérifier si la fonctionnalité est définie
+  if (!feature) {
+    return;
+  }
 
-          // Récupérer les coordonnées de la fonctionnalité
-          var coordinates;
-          if (feature.geometry.type === 'Point') {
-            coordinates = feature.geometry.coordinates;
-          } else if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-            coordinates = feature.geometry.coordinates[0][0];
-          } else {
-            console.log("Type de géométrie non pris en charge:", feature.geometry.type);
-            return;
-          }
+  // Récupérer les autres propriétés nécessaires pour le popup
+  var coordinates = turf.centerOfMass(feature).geometry.coordinates; // Calculer le centre de masse de la commune cliquée
+  var communeName = feature.properties.NOM;
+  var rang1 = feature.properties.Rang1;
+  var rang2 = feature.properties.Rang2;
+  var rang3 = feature.properties.Rang3;
+  var rang4 = feature.properties.Rang4;
+  var rang5 = feature.properties.Rang5;
 
-          // Inverser l'ordre des coordonnées
-          var lngLat = [coordinates[1], coordinates[0]];
+  // Créer le contenu HTML pour le popup
+  var popupContent = "<div class='popup'>";
+  popupContent += "<h3>" + communeName + "</h3>";
+  popupContent += "<p class='info'>1er rang : " + rang1 +"</p>";
+  popupContent += "<p class='info'>2ème rang : " + rang2 +"</p>";
+  popupContent += "<p class='info'>3ème rang : " + rang3 +"</p>";
+  popupContent += "<p class='info'>4ème rang : " + rang4 +"</p>";
+  popupContent += "<p class='info'>5ème rang : " + rang5 +"</p>";
+  popupContent += "</div>";
 
-          // Vérifier si les coordonnées sont valides
-          if (isNaN(lngLat[0]) || isNaN(lngLat[1])) {
-            console.log("Coordonnées invalides:", lngLat);
-            return;
-          }
+  // Créer une popup et attacher-la à l'élément cliqué
+  new mapboxgl.Popup()
+    .setLngLat(coordinates)
+    .setHTML(popupContent)
+    .addTo(map);
 
-          // Récupérer les autres propriétés nécessaires pour le popup
-          var communeName = feature.properties['Nom_com'];
-          var rang1 = feature.properties.Rang1;
-          var rang2 = feature.properties.Rang2;
-          var rang3 = feature.properties.Rang3;
-          var rang4 = feature.properties.Rang4;
-          var rang5 = feature.properties.Rang5;
+  // Mettre en surbrillance la commune cliquée
+  map.setFeatureState({
+    source: 'source_com',
+    sourceLayer: 'communes',
+    id: feature.id
+  }, {
+    hover: true
+  });
 
-          // Créer le contenu HTML pour le popup
-          var popupContent = "<div class='popup'>";
-          popupContent += "<h3>" + communeName + "</h3>";
-          popupContent += "<p class='info'>1er rang : " + rang1 +"</p>";
-          popupContent += "<p class='info'>2ème rang : " + rang2 +"</p>";
-          popupContent += "<p class='info'>3ème rang : " + rang3 +"</p>";
-          popupContent += "<p class='info'>4ème rang : " + rang4 +"</p>";
-          popupContent += "<p class='info'>5ème rang : " + rang5 +"</p>";
-          popupContent += "</div>";
-
-          // Créer une instance de Popup
-          var popup = new mapboxgl.Popup({
-            offset: 25
-          })
-          .setLngLat(lngLat)
-          .setHTML(popupContent)
-          .addTo(map);
-        } else {
-          console.log("Aucune fonctionnalité de la couche communesLayer n'a été cliquée.");
-        }
-      });
-
-        
-
+  // Réinitialiser la couleur de la commune précédemment cliquée
+  if (previousFeatureId) {
+    map.setFeatureState({
+      source: 'source_com',
+      sourceLayer: 'communes',
+      id: previousFeatureId
+    }, {
+      hover: false
     });
+  }
+
+  // Mettre à jour la variable previousFeatureId
+  previousFeatureId = feature.id;
+
+  // Mettre à jour la couleur de la commune cliquée
+  map.setPaintProperty('communes', 'fill-color', '#ff0000', feature.id);
 });
+
+
+
 
 
 
